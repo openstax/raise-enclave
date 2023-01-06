@@ -23,12 +23,12 @@ A relatively trivial example of an analysis can be found in this repo [here](../
 
 Enclave containers can access the following data CSV files:
 
-* `assessments.csv`
-* `courses.csv`
-* `enrollments.csv`
-* `grades.csv`
-* `oneroster_demographics.csv`
-* `users.csv`
+* [assessments.csv](#assessmentscsv)
+* [courses.csv](#coursescsv)
+* [enrollments.csv](#enrollmentscsv)
+* [grades.csv](#gradescsv)
+* [oneroster_demographics.csv](#oneroster_demographicscsv)
+* [users.csv](#userscsv)
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
 
