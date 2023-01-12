@@ -1,7 +1,8 @@
 from datetime import datetime
 import json
 from typing import Literal
-from uuid import UUID, uuid4
+from uuid import UUID
+import random as rd
 from math import isnan
 import os
 import boto3
@@ -305,7 +306,7 @@ def generate_users_df(users_dict):
                     "last_name": user['lastname'],
                     "email": user_email,
                     "user_id": user['id'],
-                    "uuid": uuid4()
+                    "uuid": UUID(int=rd.getrandbits(128))
                 })
     return pd.DataFrame(user_data)
 

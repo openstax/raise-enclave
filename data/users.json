@@ -1,0 +1,162 @@
+[
+  {
+    "department": "",
+    "description": "",
+    "descriptionformat": 1,
+    "email": "davidtucci13431@gmail.us",
+    "enrolledcourses": [
+      {
+        "fullname": "Algebra 1 (Research Dev)",
+        "id": 2,
+        "shortname": "Alg1"
+      }
+    ],
+    "firstaccess": 1661273594,
+    "firstname": "David",
+    "fullname": "David Tucci",
+    "groups": [],
+    "id": 7,
+    "lastaccess": 1661273865,
+    "lastcourseaccess": 1661273865,
+    "lastname": "Tucci",
+    "profileimageurl": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f1",
+    "profileimageurlsmall": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f2",
+    "roles": [
+      {
+        "name": "",
+        "roleid": 5,
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "username": "davidtucci13431@gmail.us"
+  },
+  {
+    "department": "",
+    "description": "",
+    "descriptionformat": 1,
+    "email": "deannjames121231@gmail.com",
+    "enrolledcourses": [
+      {
+        "fullname": "Algebra 1 (Research Dev)",
+        "id": 2,
+        "shortname": "Alg1"
+      }
+    ],
+    "firstaccess": 1661273125,
+    "firstname": "Deann",
+    "fullname": "Deann James",
+    "groups": [],
+    "id": 11,
+    "lastaccess": 1661273186,
+    "lastcourseaccess": 1661273202,
+    "lastname": "James",
+    "profileimageurl": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f1",
+    "profileimageurlsmall": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f2",
+    "roles": [
+      {
+        "name": "",
+        "roleid": 5,
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "username": "deannjames121231@gmail.com"
+  },
+  {
+    "department": "",
+    "description": "",
+    "descriptionformat": 1,
+    "email": "doncastle1234123@gmail.com",
+    "enrolledcourses": [
+      {
+        "fullname": "Algebra 1 (Research Dev)",
+        "id": 2,
+        "shortname": "Alg1"
+      }
+    ],
+    "firstaccess": 1661272974,
+    "firstname": "Don",
+    "fullname": "Don Castle",
+    "groups": [],
+    "id": 10,
+    "lastaccess": 1661273103,
+    "lastcourseaccess": 1661273105,
+    "lastname": "Castle",
+    "profileimageurl": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f1",
+    "profileimageurlsmall": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f2",
+    "roles": [
+      {
+        "name": "",
+        "roleid": 4,
+        "shortname": "teacher",
+        "sortorder": 0
+      }
+    ],
+    "username": "doncastle1234123@gmail.com"
+  },
+  {
+    "department": "",
+    "description": "",
+    "descriptionformat": 1,
+    "email": "jamesstewart1234121@gmail.com",
+    "enrolledcourses": [
+      {
+        "fullname": "Algebra 1 (Research Dev)",
+        "id": 2,
+        "shortname": "Alg1"
+      }
+    ],
+    "firstaccess": 1661273287,
+    "firstname": "James",
+    "fullname": "James Stewart",
+    "groups": [],
+    "id": 8,
+    "lastaccess": 1661278589,
+    "lastcourseaccess": 1661278591,
+    "lastname": "Stewart",
+    "profileimageurl": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f1",
+    "profileimageurlsmall": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f2",
+    "roles": [
+      {
+        "name": "",
+        "roleid": 5,
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "username": "jamesstewart1234121@gmail.com"
+  },
+  {
+    "department": "",
+    "description": "",
+    "descriptionformat": 1,
+    "email": "margueritebell53245@gmail.com",
+    "enrolledcourses": [
+      {
+        "fullname": "Algebra 1 (Research Dev)",
+        "id": 2,
+        "shortname": "Alg1"
+      }
+    ],
+    "firstaccess": 1661272048,
+    "firstname": "Marguerite",
+    "fullname": "Marguerite Bell",
+    "groups": [],
+    "id": 9,
+    "lastaccess": 1661272665,
+    "lastcourseaccess": 1661272665,
+    "lastname": "Bell",
+    "profileimageurl": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f1",
+    "profileimageurlsmall": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f2",
+    "roles": [
+      {
+        "name": "",
+        "roleid": 5,
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "username": "margueritebell53245@gmail.com"
+  }
+]
