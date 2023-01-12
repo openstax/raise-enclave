@@ -1,0 +1,5 @@
+sourcedId,birthDate,sex,americanIndianOrAlaskaNative,asian,blackOrAfricanAmerican,nativeHawaiianOrOtherPacificIslander,white,demographicRaceTwoOrMoreRaces,hispanicOrLatinoEthnicity,countryOfBirthCode,stateOfBirthAbbreviation,cityOfBirth,publicSchoolResidenceStatus
+U100,2008-01-03,female,true,false,false,false,false,false,false,NA,TX,Frisco,NA
+U101,2008-03-17,female,false,false,false,false,false,false,true,NA,TX,Houston,NA
+U102,2007-12-20,male,false,false,true,false,false,false,false,NA,TX,Corpus Christi,NA
+U103,2007-11-29,male,false,false,false,false,true,false,false,NA,TX,San Antonio,NA
