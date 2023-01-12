@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 from typing import Literal
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 from math import isnan
 import os
 import boto3
