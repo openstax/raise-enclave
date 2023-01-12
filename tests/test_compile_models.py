@@ -1,4 +1,3 @@
-from distutils import filelist
 import boto3
 from botocore.stub import Stubber
 from enclave_mgmt import compile_models
@@ -24,16 +23,15 @@ def local_file_collections():
 
         return or_users, or_dems, moodle_grades, moodle_users
     return _builder
-        
+
 
 def test_student_columns(mocker, tmp_path, local_file_collections):
     rd.seed(1)
     os.environ["CSV_OUTPUT_DIR"] = str(tmp_path)
 
-    zip_bucket_name="sample_bucket"
+    zip_bucket_name = "sample_bucket"
     zipfile_name = "one_roster.zip"
     zip_key = zip_bucket_name + "/" + zipfile_name
-
 
     or_users, or_dems, moodle_grades, moodle_users = local_file_collections()
 
@@ -45,48 +43,53 @@ def test_student_columns(mocker, tmp_path, local_file_collections):
 
     s3_client = boto3.client('s3')
     stubber_client = Stubber(s3_client)
-    stubber_client.add_response('get_object', {"Body": zip_data},
-                         expected_params={
-                            'Bucket': zip_bucket_name,
-                            'Key': zip_key
-                         }
-                        )
+    stubber_client.add_response(
+        'get_object', {"Body": zip_data},
+        expected_params={
+            'Bucket': zip_bucket_name,
+            'Key': zip_key
+            }
+        )
 
     moodle_bucket_name = "sample_bucket"
     moodle_key = "moodle_files"
     grade_list = {"Contents": [{"Key": "1"}]}
     user_list = {"Contents": [{"Key": "1"}]}
 
-    stubber_client.add_response("list_objects", grade_list,
-                         expected_params={
-                            'Bucket': moodle_bucket_name,
-        					'Prefix': f"{moodle_key}/grades"
-                          })
+    stubber_client.add_response(
+        "list_objects", grade_list,
+        expected_params={
+            'Bucket': moodle_bucket_name,
+            'Prefix': f"{moodle_key}/grades"
+        })
 
-    stubber_client.add_response("list_objects", user_list,
-                         expected_params={
-                            'Bucket': moodle_bucket_name,
-        					'Prefix': f"{moodle_key}/users"
-						 }
-	)
+    stubber_client.add_response(
+        "list_objects", user_list,
+        expected_params={
+            'Bucket': moodle_bucket_name,
+            'Prefix': f"{moodle_key}/users"
+        }
+    )
 
     grades_data = json.dumps(moodle_grades).encode('utf-8')
     grades_data_obj = {"Body": io.BytesIO(grades_data)}
     users_data = json.dumps(moodle_users).encode('utf-8')
     users_data_obj = {"Body": io.BytesIO(users_data)}
 
-    stubber_client.add_response('get_object', grades_data_obj,
-                         expected_params={
-                            'Bucket': moodle_bucket_name,
-                            'Key': f'1'
-                          }
-                         )
-    stubber_client.add_response('get_object', users_data_obj,
-                         expected_params={
-                            'Bucket': moodle_bucket_name,
-                            'Key': f'1'
-                          }
-                         )
+    stubber_client.add_response(
+        'get_object', grades_data_obj,
+        expected_params={
+            'Bucket': moodle_bucket_name,
+            'Key': '1'
+        }
+    )
+    stubber_client.add_response(
+        'get_object', users_data_obj,
+        expected_params={
+            'Bucket': moodle_bucket_name,
+            'Key': '1'
+        }
+    )
 
     stubber_client.activate()
     mocker.patch('boto3.client', lambda service: s3_client)
@@ -144,8 +147,10 @@ def test_student_columns(mocker, tmp_path, local_file_collections):
         file = f.read()
         assert file == \
             'user_uuid,birth_date,sex,american_indian_or_alaska_native,' +\
-            'asian,black_or_african_american,native_hawaiian_or_other_pacific_islander,' +\
-            'white,demographic_race_two_or_more_races,hispanic_or_latino_ethnicity\n' +\
+            'asian,black_or_african_american,' +\
+            'native_hawaiian_or_other_pacific_islander,' +\
+            'white,demographic_race_two_or_more_races,' +\
+            'hispanic_or_latino_ethnicity\n' +\
             'cd613e30-d8f1-6adf-91b7-584a2265b1f5,2007-11-29,' +\
             'male,false,false,false,false,true,false,false\n' +\
             '1e2feb89-414c-343c-1027-c4d1c386bbc4,2008-03-17,' +\
@@ -168,7 +173,8 @@ def test_student_columns(mocker, tmp_path, local_file_collections):
     with open(tmp_path / "grades.csv", 'r') as f:
         file = f.read()
         assert file == \
-            'assessment_id,user_uuid,course_id,grade_percentage,time_submitted\n' +\
+            'assessment_id,user_uuid,course_id,' +\
+            'grade_percentage,time_submitted\n' +\
             '0,e4b06ce6-0741-c7a8-7ce4-2c8218072e8c,1,0.0,1661272078\n' +\
             '1,e4b06ce6-0741-c7a8-7ce4-2c8218072e8c,1,80.0,1661272186\n' +\
             '4,e4b06ce6-0741-c7a8-7ce4-2c8218072e8c,1,75.0,1661272358\n' +\
