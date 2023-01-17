@@ -1,0 +1,24 @@
+version: 0.2
+
+env:
+  shell: bash
+  secrets-manager:
+    DOCKERHUB_USERNAME: "dockerhub:username"
+    DOCKERHUB_TOKEN: "dockerhub:token"
+    SLACK_WEBHOOKURL: "slack:k12stream"
+
+phases:
+  pre_build:
+    commands:
+      - echo $DOCKERHUB_TOKEN | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - export IMAGE_NAME=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - export IMAGE_TAG=latest
+  build:
+    commands:
+      - docker build . -t $IMAGE_NAME:$IMAGE_TAG
+  post_build:
+    commands:
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - docker push $IMAGE_NAME:$IMAGE_TAG
+      - export SLACK_MESSAGE="ECR image $IMAGE_NAME updated successfully using commit $COMMIT_ID"
+      - "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"'\"$SLACK_MESSAGE\"'\"}' $SLACK_WEBHOOKURL"
