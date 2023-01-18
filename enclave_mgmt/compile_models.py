@@ -104,9 +104,9 @@ def questions_model(clean_raw_df, assessments_df):
     )
     quiz_questions.rename(columns={'id': 'assessment_id'}, inplace=True)
     quiz_questions = quiz_questions[
-        ['question_number',
-         'question_id',
-         'assessment_id']
+        ['assessment_id',
+         'question_number',
+         'question_id']
     ]
     return quiz_questions
 
@@ -410,9 +410,9 @@ def collect_oneroster_dfs(bucket, key):
 
 
 def collect_quiz_dfs(bucket, key):
-    key_questions = key + "/contents/quiz_questions.csv"
-    key_question_contents = key + "/contents/quiz_question_contents.csv"
-    key_multichoice_answers = key + "/contents/quiz_multichoice_answers.csv"
+    key_questions = key + "/content/quiz_questions.csv"
+    key_question_contents = key + "/content/quiz_question_contents.csv"
+    key_multichoice_answers = key + "/content/quiz_multichoice_answers.csv"
 
     s3_client = boto3.client("s3")
     quiz_question_stream = s3_client.get_object(

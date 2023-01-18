@@ -42,21 +42,21 @@ def test_compile_models(
             }
         )
 
-    moodle_bucket_name = "sample_bucket"
-    moodle_key = "moodle_files"
+    data_bucket_name = "sample_bucket"
+    data_key = "moodle_files"
     grade_list = {"Contents": [{"Key": "2"}]}
     user_list = {"Contents": [{"Key": "2"}]}
     stubber_client.add_response(
         "list_objects", grade_list,
         expected_params={
-            'Bucket': moodle_bucket_name,
-            'Prefix': f"{moodle_key}/moodle/grades"
+            'Bucket': data_bucket_name,
+            'Prefix': f"{data_key}/moodle/grades"
         })
     stubber_client.add_response(
         "list_objects", user_list,
         expected_params={
-            'Bucket': moodle_bucket_name,
-            'Prefix': f"{moodle_key}/moodle/users"
+            'Bucket': data_bucket_name,
+            'Prefix': f"{data_key}/moodle/users"
         }
     )
 
@@ -67,14 +67,14 @@ def test_compile_models(
     stubber_client.add_response(
         'get_object', grades_data_obj,
         expected_params={
-            'Bucket': moodle_bucket_name,
+            'Bucket': data_bucket_name,
             'Key': '2'
         }
     )
     stubber_client.add_response(
         'get_object', users_data_obj,
         expected_params={
-            'Bucket': moodle_bucket_name,
+            'Bucket': data_bucket_name,
             'Key': '2'
         }
     )
@@ -83,8 +83,8 @@ def test_compile_models(
     stubber_client.add_response(
         'get_object', {"Body": body},
         expected_params={
-            'Bucket': moodle_bucket_name,
-            'Key': f"{moodle_key}/contents/quiz_questions.csv"
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/quiz_questions.csv"
             }
         )
 
@@ -92,8 +92,8 @@ def test_compile_models(
     stubber_client.add_response(
         'get_object', {"Body": body},
         expected_params={
-            'Bucket': moodle_bucket_name,
-            'Key': f"{moodle_key}/contents/quiz_question_contents.csv"
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/quiz_question_contents.csv"
             }
         )
 
@@ -101,8 +101,8 @@ def test_compile_models(
     stubber_client.add_response(
         'get_object', {"Body": body},
         expected_params={
-            'Bucket': moodle_bucket_name,
-            'Key': f"{moodle_key}/contents/quiz_multichoice_answers.csv"
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/quiz_multichoice_answers.csv"
             }
         )
 
@@ -111,7 +111,7 @@ def test_compile_models(
 
     mocker.patch(
         "sys.argv",
-        ["", moodle_bucket_name, moodle_key, zip_bucket_name, zip_key]
+        ["", data_bucket_name, data_key, zip_bucket_name, zip_key]
     )
     compile_models.main()
 
