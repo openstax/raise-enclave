@@ -342,11 +342,11 @@ def collect_cli_dfs(bucket, prefix):
     # Note that these will only get 1000 classes at a time
     grade_data_objects = s3_client.list_objects(
         Bucket=bucket,
-        Prefix=f"{prefix}/grades"
+        Prefix=f"{prefix}/moodle/grades"
     )
     users_data_objects = s3_client.list_objects(
         Bucket=bucket,
-        Prefix=f"{prefix}/users"
+        Prefix=f"{prefix}/moodle/users"
     )
     for data_object in grade_data_objects.get("Contents"):
         object_key = data_object.get("Key")

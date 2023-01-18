@@ -50,13 +50,13 @@ def test_compile_models(
         "list_objects", grade_list,
         expected_params={
             'Bucket': moodle_bucket_name,
-            'Prefix': f"{moodle_key}/grades"
+            'Prefix': f"{moodle_key}/moodle/grades"
         })
     stubber_client.add_response(
         "list_objects", user_list,
         expected_params={
             'Bucket': moodle_bucket_name,
-            'Prefix': f"{moodle_key}/users"
+            'Prefix': f"{moodle_key}/moodle/users"
         }
     )
 
