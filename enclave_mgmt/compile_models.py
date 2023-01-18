@@ -122,7 +122,7 @@ def courses_model(clean_raw_df):
 
 def enrollments_model(clean_raw_df):
     enrollments_df = clean_raw_df['enrollments']
-    users_df = clean_raw_df['cli_users'][['user_id', 'uuid']]
+    users_df = clean_raw_df['moodle_users'][['user_id', 'uuid']]
     enrollments_df = pd.merge(enrollments_df, users_df, on='user_id')
     enrollments_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
     enrollments_df = enrollments_df[['user_uuid', 'course_id', 'role']]
@@ -134,7 +134,7 @@ def enrollments_model(clean_raw_df):
 
 
 def users_model(clean_raw_df):
-    users_df = clean_raw_df['cli_users']
+    users_df = clean_raw_df['moodle_users']
     users_df = users_df[['uuid', 'first_name', 'last_name', 'email']]
 
     for item in users_df.to_dict(orient='records'):
@@ -153,8 +153,8 @@ def assessments_and_grades_model(clean_raw_df):
         grades_df, assessments_df, left_on='assessment_name', right_on='name'
     )
     grades_df.rename(columns={'id': 'assessment_id'}, inplace=True)
-    cli_users = clean_raw_df['cli_users'][['user_id', 'uuid']]
-    grades_df = pd.merge(grades_df, cli_users, on='user_id')
+    moodle_users = clean_raw_df['moodle_users'][['user_id', 'uuid']]
+    grades_df = pd.merge(grades_df, moodle_users, on='user_id')
     grades_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
     grades_df = grades_df[
         ['assessment_id',
@@ -206,7 +206,7 @@ def demographics_model(all_raw_dfs):
 
     id_2_email = all_raw_dfs['or_users'][['email', 'sourcedId']]
     demographic_df = pd.merge(id_2_email, demographic_df, on='sourcedId')
-    email_2_uuid = all_raw_dfs['cli_users'][['email', 'uuid']]
+    email_2_uuid = all_raw_dfs['moodle_users'][['email', 'uuid']]
     demographic_df = pd.merge(email_2_uuid, demographic_df, on='email')
 
     demographic_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
@@ -226,18 +226,18 @@ def demographics_model(all_raw_dfs):
 
 def scrub_raw_dfs(all_raw_dfs):
     or_users_df = all_raw_dfs['or_users']
-    cli_users_df = all_raw_dfs['cli_users']
+    moodle_users_df = all_raw_dfs['moodle_users']
 
     or_users_df['email'] = or_users_df['email'].apply(
         lambda col: col.lower())
-    cli_users_df['email'] = cli_users_df['email'].apply(
+    moodle_users_df['email'] = moodle_users_df['email'].apply(
         lambda col: col.lower())
 
     grade_df = all_raw_dfs['grades']
     grade_df = grade_df[grade_df['assessment_name'].notnull()]
 
     all_raw_dfs['or_users'] = or_users_df
-    all_raw_dfs['cli_users'] = cli_users_df
+    all_raw_dfs['moodle_users'] = moodle_users_df
     all_raw_dfs['grades'] = grade_df
 
     return all_raw_dfs
@@ -336,7 +336,7 @@ def generate_users_df(users_dict):
     return pd.DataFrame(user_data)
 
 
-def collect_cli_dfs(bucket, prefix):
+def collect_moodle_dfs(bucket, prefix):
     grades_dict, users_dict = {}, {}
     s3_client = boto3.client("s3")
     # Note that these will only get 1000 classes at a time
@@ -369,7 +369,7 @@ def collect_cli_dfs(bucket, prefix):
         users_dict[int(course_id)] = json.loads(contents)
 
     return {
-        'cli_users': generate_users_df(users_dict),
+        'moodle_users': generate_users_df(users_dict),
         'courses': generate_courses_df(users_dict),
         'enrollments': generate_enrollment_df(users_dict),
         'grades': generate_grade_df(grades_dict)
@@ -441,23 +441,23 @@ def collect_quiz_dfs(bucket, key):
 
 
 def compile_models(
-    cli_bucket,
-    cli_key,
+    data_bucket,
+    data_key,
     oneroster_bucket,
     oneroster_key
 ):
     oneroster_dfs = collect_oneroster_dfs(oneroster_bucket, oneroster_key)
-    cli_dfs = collect_cli_dfs(cli_bucket, cli_key)
-    quiz_data_dfs = collect_quiz_dfs(cli_bucket, cli_key)
-    all_raw_dfs = oneroster_dfs | cli_dfs | quiz_data_dfs
+    moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
+    quiz_data_dfs = collect_quiz_dfs(data_bucket, data_key)
+    all_raw_dfs = oneroster_dfs | moodle_dfs | quiz_data_dfs
     return all_raw_dfs
 
 
 def main():
     parser = argparse.ArgumentParser(description='Upload Resources to S3')
-    parser.add_argument('cli_data_bucket', type=str,
+    parser.add_argument('data_bucket', type=str,
                         help='bucket for the moodle grade and user data dirs')
-    parser.add_argument('cli_data_prefix', type=str,
+    parser.add_argument('data_prefix', type=str,
                         help='prefix for the moodle grade and user data dirs')
     parser.add_argument('oneroster_bucket', type=str,
                         help='bucket for oneroster data')
@@ -468,8 +468,8 @@ def main():
     output_path = os.environ["CSV_OUTPUT_DIR"]
 
     all_raw_dfs = compile_models(
-        args.cli_data_bucket,
-        args.cli_data_prefix,
+        args.data_bucket,
+        args.data_prefix,
         args.oneroster_bucket,
         args.oneroster_key)
 
