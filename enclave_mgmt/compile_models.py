@@ -97,18 +97,66 @@ class User(BaseModel):
         extra = Extra.forbid
 
 
-def questions_model(clean_raw_df, assessments_df):
-    quiz_questions = clean_raw_df['quiz_questions']
-    quiz_questions = pd.merge(
-        quiz_questions, assessments_df, left_on='quiz_name', right_on='name'
+class QuizQuestion(BaseModel):
+    assessment_id: int
+    question_number: int
+    question_id: UUID
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizQuestionContents(BaseModel):
+    id: UUID
+    text: str
+    type: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizMultichoiceAnswer(BaseModel):
+    id: int
+    question_id: UUID
+    text: str
+    grade: float
+    feedback: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+def multichoice_answer_model(clean_raw_df):
+    quiz_multichoice_answer_df = clean_raw_df['quiz_multichoice_answers']
+    quiz_multichoice_answer_df.insert(
+        0, 'id', quiz_multichoice_answer_df.index
     )
-    quiz_questions.rename(columns={'id': 'assessment_id'}, inplace=True)
-    quiz_questions = quiz_questions[
+    for item in quiz_multichoice_answer_df.to_dict(orient='records'):
+        QuizMultichoiceAnswer.parse_obj(item)
+    return quiz_multichoice_answer_df
+
+
+def question_contents_model(clean_raw_df):
+    quiz_question_contents_df = clean_raw_df['quiz_question_contents']
+    for item in quiz_question_contents_df.to_dict(orient='records'):
+        QuizQuestionContents.parse_obj(item)
+    return quiz_question_contents_df
+
+
+def questions_model(clean_raw_df, assessments_df):
+    quiz_questions_df = clean_raw_df['quiz_questions']
+    quiz_questions_df = pd.merge(
+        quiz_questions_df, assessments_df, left_on='quiz_name', right_on='name'
+    )
+    quiz_questions_df.rename(columns={'id': 'assessment_id'}, inplace=True)
+    quiz_questions_df = quiz_questions_df[
         ['assessment_id',
          'question_number',
          'question_id']
     ]
-    return quiz_questions
+    for item in quiz_questions_df.to_dict(orient='records'):
+        QuizQuestion.parse_obj(item)
+    return quiz_questions_df
 
 
 def courses_model(clean_raw_df):
@@ -253,8 +301,8 @@ def create_models(output_path, all_raw_dfs):
     enrollments_df = enrollments_model(clean_raw_df)
     courses_df = courses_model(clean_raw_df)
     quiz_questions_df = questions_model(clean_raw_df, assessments_df)
-    quiz_question_contents_df = clean_raw_df['quiz_question_contents']
-    quiz_multichoice_answers_df = clean_raw_df['quiz_multichoice_answers']
+    quiz_question_contents_df = question_contents_model(clean_raw_df)
+    quiz_multichoice_answers_df = multichoice_answer_model(clean_raw_df)
 
     with open(f"{output_path}/{MODEL_FILE_ONEROSTER_DEMOGRAPHICS}", "w") as f:
         demographics_df.to_csv(f, index=False)
@@ -273,7 +321,7 @@ def create_models(output_path, all_raw_dfs):
     with open(f"{output_path}/{MODEL_QUIZ_QUESTION_CONTENTS}", "w") as f:
         quiz_question_contents_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_MULTICHOICE_ANSWERS}", "w") as f:
-        quiz_multichoice_answers_df.to_csv(f, index=True, index_label="id")
+        quiz_multichoice_answers_df.to_csv(f, index=False)
 
 
 def generate_grade_df(grade_dict):
@@ -432,7 +480,7 @@ def collect_quiz_dfs(bucket, key):
         BytesIO(quiz_question_contents_stream["Body"].read())
     )
     quiz_multichoice_answers_data = pd.read_csv(
-        BytesIO(quiz_multichoice_answers_stream["Body"].read())
+        BytesIO(quiz_multichoice_answers_stream["Body"].read()),
     )
 
     return {"quiz_questions": quiz_question_data,
