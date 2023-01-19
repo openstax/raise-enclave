@@ -17,6 +17,9 @@ MODEL_FILE_ONEROSTER_DEMOGRAPHICS = "oneroster_demographics.csv"
 MODEL_FILE_ENROLLMENTS = "enrollments.csv"
 MODEL_FILE_ASSESSMENTS = "assessments.csv"
 MODEL_FILE_GRADES = "grades.csv"
+MODEL_QUIZ_QUESTIONS = "quiz_questions.csv"
+MODEL_QUIZ_QUESTION_CONTENTS = "quiz_question_contents.csv"
+MODEL_MULTICHOICE_ANSWERS = "quiz_multichoice_answers.csv"
 
 
 class Demographic(BaseModel):
@@ -94,6 +97,68 @@ class User(BaseModel):
         extra = Extra.forbid
 
 
+class QuizQuestion(BaseModel):
+    assessment_id: int
+    question_number: int
+    question_id: UUID
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizQuestionContents(BaseModel):
+    id: UUID
+    text: str
+    type: Literal['multichoice', 'multianswer', 'numerical', 'essay']
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizMultichoiceAnswer(BaseModel):
+    id: int
+    question_id: UUID
+    text: str
+    grade: float
+    feedback: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+def multichoice_answer_model(clean_raw_df):
+    quiz_multichoice_answer_df = clean_raw_df['quiz_multichoice_answers']
+    quiz_multichoice_answer_df.insert(
+        0, 'id', quiz_multichoice_answer_df.index
+    )
+    for item in quiz_multichoice_answer_df.to_dict(orient='records'):
+        QuizMultichoiceAnswer.parse_obj(item)
+    return quiz_multichoice_answer_df
+
+
+def question_contents_model(clean_raw_df):
+    quiz_question_contents_df = clean_raw_df['quiz_question_contents']
+    for item in quiz_question_contents_df.to_dict(orient='records'):
+        QuizQuestionContents.parse_obj(item)
+    return quiz_question_contents_df
+
+
+def questions_model(clean_raw_df, assessments_df):
+    quiz_questions_df = clean_raw_df['quiz_questions']
+    quiz_questions_df = pd.merge(
+        quiz_questions_df, assessments_df, left_on='quiz_name', right_on='name'
+    )
+    quiz_questions_df.rename(columns={'id': 'assessment_id'}, inplace=True)
+    quiz_questions_df = quiz_questions_df[
+        ['assessment_id',
+         'question_number',
+         'question_id']
+    ]
+    for item in quiz_questions_df.to_dict(orient='records'):
+        QuizQuestion.parse_obj(item)
+    return quiz_questions_df
+
+
 def courses_model(clean_raw_df):
     courses_df = clean_raw_df['courses']
 
@@ -105,7 +170,7 @@ def courses_model(clean_raw_df):
 
 def enrollments_model(clean_raw_df):
     enrollments_df = clean_raw_df['enrollments']
-    users_df = clean_raw_df['cli_users'][['user_id', 'uuid']]
+    users_df = clean_raw_df['moodle_users'][['user_id', 'uuid']]
     enrollments_df = pd.merge(enrollments_df, users_df, on='user_id')
     enrollments_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
     enrollments_df = enrollments_df[['user_uuid', 'course_id', 'role']]
@@ -117,7 +182,7 @@ def enrollments_model(clean_raw_df):
 
 
 def users_model(clean_raw_df):
-    users_df = clean_raw_df['cli_users']
+    users_df = clean_raw_df['moodle_users']
     users_df = users_df[['uuid', 'first_name', 'last_name', 'email']]
 
     for item in users_df.to_dict(orient='records'):
@@ -136,8 +201,8 @@ def assessments_and_grades_model(clean_raw_df):
         grades_df, assessments_df, left_on='assessment_name', right_on='name'
     )
     grades_df.rename(columns={'id': 'assessment_id'}, inplace=True)
-    cli_users = clean_raw_df['cli_users'][['user_id', 'uuid']]
-    grades_df = pd.merge(grades_df, cli_users, on='user_id')
+    moodle_users = clean_raw_df['moodle_users'][['user_id', 'uuid']]
+    grades_df = pd.merge(grades_df, moodle_users, on='user_id')
     grades_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
     grades_df = grades_df[
         ['assessment_id',
@@ -189,7 +254,7 @@ def demographics_model(all_raw_dfs):
 
     id_2_email = all_raw_dfs['or_users'][['email', 'sourcedId']]
     demographic_df = pd.merge(id_2_email, demographic_df, on='sourcedId')
-    email_2_uuid = all_raw_dfs['cli_users'][['email', 'uuid']]
+    email_2_uuid = all_raw_dfs['moodle_users'][['email', 'uuid']]
     demographic_df = pd.merge(email_2_uuid, demographic_df, on='email')
 
     demographic_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
@@ -209,18 +274,18 @@ def demographics_model(all_raw_dfs):
 
 def scrub_raw_dfs(all_raw_dfs):
     or_users_df = all_raw_dfs['or_users']
-    cli_users_df = all_raw_dfs['cli_users']
+    moodle_users_df = all_raw_dfs['moodle_users']
 
     or_users_df['email'] = or_users_df['email'].apply(
         lambda col: col.lower())
-    cli_users_df['email'] = cli_users_df['email'].apply(
+    moodle_users_df['email'] = moodle_users_df['email'].apply(
         lambda col: col.lower())
 
     grade_df = all_raw_dfs['grades']
     grade_df = grade_df[grade_df['assessment_name'].notnull()]
 
     all_raw_dfs['or_users'] = or_users_df
-    all_raw_dfs['cli_users'] = cli_users_df
+    all_raw_dfs['moodle_users'] = moodle_users_df
     all_raw_dfs['grades'] = grade_df
 
     return all_raw_dfs
@@ -235,6 +300,9 @@ def create_models(output_path, all_raw_dfs):
     users_df = users_model(clean_raw_df)
     enrollments_df = enrollments_model(clean_raw_df)
     courses_df = courses_model(clean_raw_df)
+    quiz_questions_df = questions_model(clean_raw_df, assessments_df)
+    quiz_question_contents_df = question_contents_model(clean_raw_df)
+    quiz_multichoice_answers_df = multichoice_answer_model(clean_raw_df)
 
     with open(f"{output_path}/{MODEL_FILE_ONEROSTER_DEMOGRAPHICS}", "w") as f:
         demographics_df.to_csv(f, index=False)
@@ -248,6 +316,12 @@ def create_models(output_path, all_raw_dfs):
         courses_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_FILE_ASSESSMENTS}", "w") as f:
         assessments_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_QUIZ_QUESTIONS}", "w") as f:
+        quiz_questions_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_QUIZ_QUESTION_CONTENTS}", "w") as f:
+        quiz_question_contents_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_MULTICHOICE_ANSWERS}", "w") as f:
+        quiz_multichoice_answers_df.to_csv(f, index=False)
 
 
 def generate_grade_df(grade_dict):
@@ -310,17 +384,17 @@ def generate_users_df(users_dict):
     return pd.DataFrame(user_data)
 
 
-def collect_cli_dfs(bucket, prefix):
+def collect_moodle_dfs(bucket, prefix):
     grades_dict, users_dict = {}, {}
     s3_client = boto3.client("s3")
     # Note that these will only get 1000 classes at a time
     grade_data_objects = s3_client.list_objects(
         Bucket=bucket,
-        Prefix=f"{prefix}/grades"
+        Prefix=f"{prefix}/moodle/grades"
     )
     users_data_objects = s3_client.list_objects(
         Bucket=bucket,
-        Prefix=f"{prefix}/users"
+        Prefix=f"{prefix}/moodle/users"
     )
     for data_object in grade_data_objects.get("Contents"):
         object_key = data_object.get("Key")
@@ -343,7 +417,7 @@ def collect_cli_dfs(bucket, prefix):
         users_dict[int(course_id)] = json.loads(contents)
 
     return {
-        'cli_users': generate_users_df(users_dict),
+        'moodle_users': generate_users_df(users_dict),
         'courses': generate_courses_df(users_dict),
         'enrollments': generate_enrollment_df(users_dict),
         'grades': generate_grade_df(grades_dict)
@@ -383,18 +457,55 @@ def collect_oneroster_dfs(bucket, key):
     }
 
 
-def compile_models(cli_bucket, cli_key, oneroster_bucket, oneroster_key):
+def collect_quiz_dfs(bucket, key):
+    key_questions = key + "/content/quiz_questions.csv"
+    key_question_contents = key + "/content/quiz_question_contents.csv"
+    key_multichoice_answers = key + "/content/quiz_multichoice_answers.csv"
+
+    s3_client = boto3.client("s3")
+    quiz_question_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_questions)
+    quiz_question_contents_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_question_contents)
+    quiz_multichoice_answers_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_multichoice_answers)
+
+    quiz_question_data = pd.read_csv(
+        BytesIO(quiz_question_stream["Body"].read())
+    )
+    quiz_question_contents_data = pd.read_csv(
+        BytesIO(quiz_question_contents_stream["Body"].read())
+    )
+    quiz_multichoice_answers_data = pd.read_csv(
+        BytesIO(quiz_multichoice_answers_stream["Body"].read()),
+    )
+
+    return {"quiz_questions": quiz_question_data,
+            "quiz_question_contents": quiz_question_contents_data,
+            "quiz_multichoice_answers": quiz_multichoice_answers_data}
+
+
+def compile_models(
+    data_bucket,
+    data_key,
+    oneroster_bucket,
+    oneroster_key
+):
     oneroster_dfs = collect_oneroster_dfs(oneroster_bucket, oneroster_key)
-    cli_dfs = collect_cli_dfs(cli_bucket, cli_key)
-    all_raw_dfs = oneroster_dfs | cli_dfs
+    moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
+    quiz_data_dfs = collect_quiz_dfs(data_bucket, data_key)
+    all_raw_dfs = oneroster_dfs | moodle_dfs | quiz_data_dfs
     return all_raw_dfs
 
 
 def main():
     parser = argparse.ArgumentParser(description='Upload Resources to S3')
-    parser.add_argument('cli_data_bucket', type=str,
+    parser.add_argument('data_bucket', type=str,
                         help='bucket for the moodle grade and user data dirs')
-    parser.add_argument('cli_data_prefix', type=str,
+    parser.add_argument('data_prefix', type=str,
                         help='prefix for the moodle grade and user data dirs')
     parser.add_argument('oneroster_bucket', type=str,
                         help='bucket for oneroster data')
@@ -405,8 +516,8 @@ def main():
     output_path = os.environ["CSV_OUTPUT_DIR"]
 
     all_raw_dfs = compile_models(
-        args.cli_data_bucket,
-        args.cli_data_prefix,
+        args.data_bucket,
+        args.data_prefix,
         args.oneroster_bucket,
         args.oneroster_key)
 

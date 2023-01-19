@@ -22,7 +22,9 @@ def test_compile_models(
     zipfile_name = "one_roster.zip"
     zip_key = zip_bucket_name + "/" + zipfile_name
 
-    or_users, or_dems, moodle_grades, moodle_users = local_file_collections
+    (or_users, or_dems, moodle_grades, moodle_users,
+        quiz_questions, quiz_question_contents,
+        quiz_multichoice_answers) = local_file_collections
 
     zip_data = io.BytesIO()
     with ZipFile(zip_data, 'w') as f:
@@ -40,21 +42,21 @@ def test_compile_models(
             }
         )
 
-    moodle_bucket_name = "sample_bucket"
-    moodle_key = "moodle_files"
+    data_bucket_name = "sample_bucket"
+    data_key = "data_files"
     grade_list = {"Contents": [{"Key": "2"}]}
     user_list = {"Contents": [{"Key": "2"}]}
     stubber_client.add_response(
         "list_objects", grade_list,
         expected_params={
-            'Bucket': moodle_bucket_name,
-            'Prefix': f"{moodle_key}/grades"
+            'Bucket': data_bucket_name,
+            'Prefix': f"{data_key}/moodle/grades"
         })
     stubber_client.add_response(
         "list_objects", user_list,
         expected_params={
-            'Bucket': moodle_bucket_name,
-            'Prefix': f"{moodle_key}/users"
+            'Bucket': data_bucket_name,
+            'Prefix': f"{data_key}/moodle/users"
         }
     )
 
@@ -65,23 +67,51 @@ def test_compile_models(
     stubber_client.add_response(
         'get_object', grades_data_obj,
         expected_params={
-            'Bucket': moodle_bucket_name,
+            'Bucket': data_bucket_name,
             'Key': '2'
         }
     )
     stubber_client.add_response(
         'get_object', users_data_obj,
         expected_params={
-            'Bucket': moodle_bucket_name,
+            'Bucket': data_bucket_name,
             'Key': '2'
         }
     )
+
+    body = io.BytesIO(quiz_questions.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/quiz_questions.csv"
+            }
+        )
+
+    body = io.BytesIO(quiz_question_contents.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/quiz_question_contents.csv"
+            }
+        )
+
+    body = io.BytesIO(quiz_multichoice_answers.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/quiz_multichoice_answers.csv"
+            }
+        )
+
     stubber_client.activate()
     mocker.patch('boto3.client', lambda service: s3_client)
 
     mocker.patch(
         "sys.argv",
-        ["", moodle_bucket_name, moodle_key, zip_bucket_name, zip_key]
+        ["", data_bucket_name, data_key, zip_bucket_name, zip_key]
     )
     compile_models.main()
 
@@ -92,7 +122,10 @@ def test_compile_models(
      expected_grades,
      expected_enrollments,
      expected_or_demographics,
-     expected_courses) = local_expected_csvs
+     expected_courses,
+     expected_quiz_questions,
+     expected_quiz_question_contents,
+     expected_quiz_multichoice_answers) = local_expected_csvs
 
     with open(tmp_path / "assessments.csv", 'r') as f:
         results = f.readlines()
@@ -122,4 +155,19 @@ def test_compile_models(
     with open(tmp_path / "grades.csv", 'r') as f:
         results = f.readlines()
         for i in expected_grades:
+            assert i in results
+
+    with open(tmp_path / "quiz_questions.csv", 'r') as f:
+        results = f.readlines()
+        for i in expected_quiz_questions:
+            assert i in results
+
+    with open(tmp_path / "quiz_question_contents.csv", 'r') as f:
+        results = f.readlines()
+        for i in expected_quiz_question_contents:
+            assert i in results
+
+    with open(tmp_path / "quiz_multichoice_answers.csv", 'r') as f:
+        results = f.readlines()
+        for i in expected_quiz_multichoice_answers:
             assert i in results

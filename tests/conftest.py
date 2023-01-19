@@ -19,8 +19,22 @@ def local_file_collections(test_data_path):
         moodle_users = json.load(f)
     with open(test_data_path / "grades.json", 'r') as f:
         moodle_grades = json.load(f)
+    with open(test_data_path / "quiz_questions.csv", 'r') as f:
+        quiz_questions = f.read()
+    with open(test_data_path / "quiz_question_contents.csv", 'r') as f:
+        quiz_question_contents = f.read()
+    with open(test_data_path / "quiz_multichoice_answers.csv", 'r') as f:
+        quiz_multichoice_answers = f.read()
 
-    return or_users, or_dems, moodle_grades, moodle_users
+    return (
+        or_users,
+        or_dems,
+        moodle_grades,
+        moodle_users,
+        quiz_questions,
+        quiz_question_contents,
+        quiz_multichoice_answers
+    )
 
 
 @pytest.fixture
@@ -38,8 +52,28 @@ def local_expected_csvs(test_data_path):
         or_demographics = f.readlines()
     with open(test_data_path / "expected/courses.csv", 'r') as f:
         courses = f.readlines()
+    with open(test_data_path / "expected/quiz_questions.csv", 'r') as f:
+        quiz_questions = f.readlines()
+    with open(
+        test_data_path / "expected/quiz_question_contents.csv", 'r'
+    ) as f:
+        quiz_question_contents = f.readlines()
+    with open(
+        test_data_path / "expected/quiz_multichoice_answers.csv", 'r'
+    ) as f:
+        quiz_multichoice_answers = f.readlines()
 
-    return assessments, users, grades, enrolments, or_demographics, courses
+    return (
+        assessments,
+        users,
+        grades,
+        enrolments,
+        or_demographics,
+        courses,
+        quiz_questions,
+        quiz_question_contents,
+        quiz_multichoice_answers
+    )
 
 
 @pytest.fixture
