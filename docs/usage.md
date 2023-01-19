@@ -31,10 +31,10 @@ Enclave containers can access the following data CSV files:
   - [`enrollments.csv`](#enrollmentscsv)
   - [`grades.csv`](#gradescsv)
   - [`oneroster_demographics.csv`](#oneroster_demographicscsv)
-  - [`users.csv`](#userscsv)
   - [`quiz_questions.csv`](#quiz_questionscsv)
   - [`quiz_question_contents.csv`](#quiz_question_contentscsv)
   - [`quiz_multichoice_answer.csv`](#quiz_multichoice_answercsv)
+  - [`users.csv`](#userscsv)
   - [Development and testing](#development-and-testing)
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
@@ -86,6 +86,31 @@ Sample files that can be used as illustrative references can be found in this re
 | demographic_race_two_or_more_races | str | Value of either `true` or `false` |
 | hispanic_or_latino_ethnicity | str | Value of either `true` or `false` |
 
+## `quiz_questions.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| assessment_id | int | Assessment ID that can be joined against `assessments.csv` |
+| question_number | int | The relative order number of the question  |
+| question_id | UUID | A unique identifier for the question number |
+
+## `quiz_question_contents.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | UUID | Question ID that can be joined against `quiz_questions.csv` |
+| text | str | The question's text |
+| type | str | The type of question (can be ['multichoice', 'multianswer', 'numerical', 'essay']) |
+
+## `quiz_multichoice_answer.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | int | A unique question answer id |
+| question_id | UUID | Question ID that can be joined against `quiz_questions.csv` |
+| text | str | The answer text |
+| grade | float | The percentage of the questions total points received for answering this answer |
+
 ## `users.csv`
 
 | Column | Type | Notes |
@@ -94,31 +119,6 @@ Sample files that can be used as illustrative references can be found in this re
 | first_name | str | User's first name |
 | last_name | str | User's last name |
 | email | str | User's email |
-
-## `quiz_questions.csv`
-
-| Column | Type | Notes |
-| - | - | - |
-| assessment_id | int | A unique assessment id |
-| question_number | int | The relative order number of the question  |
-| question_id | UUID | A unique identifier for the question number |
-
-## `quiz_question_contents.csv`
-
-| Column | Type | Notes |
-| - | - | - |
-| id | UUID | The unique question id |
-| text | str | The question's text |
-| type | ['multichoice', 'multianswer', 'numerical', 'essay'] | The type of question |
-
-## `quiz_multichoice_answer.csv`
-
-| Column | Type | Notes |
-| - | - | - |
-| id | int | A unique assessment id |
-| question_id | UUID | A unique identifier for the question number |
-| text | str | The answer text |
-| grade | float | The percentage of the questions total points received for answering this answer |
 
 ## Development and testing
 
