@@ -28,10 +28,10 @@ Enclave containers can access the following data CSV files:
 * [enrollments.csv](#enrollmentscsv)
 * [grades.csv](#gradescsv)
 * [oneroster_demographics.csv](#oneroster_demographicscsv)
-* [users.csv](#userscsv)
 * [quiz_questions.csv](#quiz_questionscsv)
 * [quiz_question_contents.csv](#quiz_question_contentscsv)
 * [quiz_multichoice_answers.csv](#quiz_multichoice_answercsv)
+* [users.csv](#userscsv)
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
 
