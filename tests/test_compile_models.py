@@ -43,7 +43,7 @@ def test_compile_models(
         )
 
     data_bucket_name = "sample_bucket"
-    data_key = "moodle_files"
+    data_key = "data_files"
     grade_list = {"Contents": [{"Key": "2"}]}
     user_list = {"Contents": [{"Key": "2"}]}
     stubber_client.add_response(

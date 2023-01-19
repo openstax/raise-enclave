@@ -109,7 +109,7 @@ class QuizQuestion(BaseModel):
 class QuizQuestionContents(BaseModel):
     id: UUID
     text: str
-    type: str
+    type: Literal['multichoice', 'multianswer', 'numerical', 'essay']
 
     class Config:
         extra = Extra.forbid
