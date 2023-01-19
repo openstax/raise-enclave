@@ -23,12 +23,19 @@ A relatively trivial example of an analysis can be found in this repo [here](../
 
 Enclave containers can access the following data CSV files:
 
-* [assessments.csv](#assessmentscsv)
-* [courses.csv](#coursescsv)
-* [enrollments.csv](#enrollmentscsv)
-* [grades.csv](#gradescsv)
-* [oneroster_demographics.csv](#oneroster_demographicscsv)
-* [users.csv](#userscsv)
+- [RAISE Enclave Usage](#raise-enclave-usage)
+  - [Operational model](#operational-model)
+  - [Data model](#data-model)
+  - [`assessments.csv`](#assessmentscsv)
+  - [`courses.csv`](#coursescsv)
+  - [`enrollments.csv`](#enrollmentscsv)
+  - [`grades.csv`](#gradescsv)
+  - [`oneroster_demographics.csv`](#oneroster_demographicscsv)
+  - [`users.csv`](#userscsv)
+  - [`quiz_questions.csv`](#quiz_questionscsv)
+  - [`quiz_question_contents.csv`](#quiz_question_contentscsv)
+  - [`quiz_multichoice_answer.csv`](#quiz_multichoice_answercsv)
+  - [Development and testing](#development-and-testing)
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
 
@@ -87,6 +94,31 @@ Sample files that can be used as illustrative references can be found in this re
 | first_name | str | User's first name |
 | last_name | str | User's last name |
 | email | str | User's email |
+
+## `quiz_questions.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| assessment_id | int | A unique assessment id |
+| question_number | int | The relative order number of the question  |
+| question_id | UUID | A unique identifier for the question number |
+
+## `quiz_question_contents.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | UUID | The unique question id |
+| text | str | The question's text |
+| type | ['multichoice', 'multianswer', 'numerical', 'essay'] | The type of question |
+
+## `quiz_multichoice_answer.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | int | A unique assessment id |
+| question_id | UUID | A unique identifier for the question number |
+| text | str | The answer text |
+| grade | float | The percentage of the questions total points received for answering this answer |
 
 ## Development and testing
 
