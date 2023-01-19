@@ -23,19 +23,12 @@ A relatively trivial example of an analysis can be found in this repo [here](../
 
 Enclave containers can access the following data CSV files:
 
-- [RAISE Enclave Usage](#raise-enclave-usage)
-  - [Operational model](#operational-model)
-  - [Data model](#data-model)
-  - [`assessments.csv`](#assessmentscsv)
-  - [`courses.csv`](#coursescsv)
-  - [`enrollments.csv`](#enrollmentscsv)
-  - [`grades.csv`](#gradescsv)
-  - [`oneroster_demographics.csv`](#oneroster_demographicscsv)
-  - [`quiz_questions.csv`](#quiz_questionscsv)
-  - [`quiz_question_contents.csv`](#quiz_question_contentscsv)
-  - [`quiz_multichoice_answer.csv`](#quiz_multichoice_answercsv)
-  - [`users.csv`](#userscsv)
-  - [Development and testing](#development-and-testing)
+* [assessments.csv](#assessmentscsv)
+* [courses.csv](#coursescsv)
+* [enrollments.csv](#enrollmentscsv)
+* [grades.csv](#gradescsv)
+* [oneroster_demographics.csv](#oneroster_demographicscsv)
+* [users.csv](#userscsv)
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
 
