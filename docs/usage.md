@@ -106,6 +106,7 @@ Sample files that can be used as illustrative references can be found in this re
 | question_id | UUID | Question ID that can be joined against `quiz_questions.csv` |
 | text | str | The answer text |
 | grade | float | The percentage of the question's total points received for this answer |
+| feedback | str | The feedback that gets delivered when this answer is chosen |
 
 ## `users.csv`
 
