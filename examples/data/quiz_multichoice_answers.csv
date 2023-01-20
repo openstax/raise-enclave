@@ -33,7 +33,7 @@ id,question_id,text,grade,feedback
 31,99134f44-0590-4fd3-86af-c926785b4a32,<p>1</p>,0.0,no
 32,da21613b-5d05-48d2-a07b-2bec166e5e54,<p>6</p>,1.0,yes
 33,da21613b-5d05-48d2-a07b-2bec166e5e54,<p>9</p>,0.0,no
-34,da21613b-5d05-48d2-a07b-2bec166e5e54,<p>10</p>,1.0,no
+34,da21613b-5d05-48d2-a07b-2bec166e5e54,<p>10</p>,0.0,no
 35,da21613b-5d05-48d2-a07b-2bec166e5e54,<p>11</p>,0.0,no
 36,6e6df72f-a6a3-424a-9ede-38b65720d2aa,<p>0</p>4</div>,0.0,no
 37,6e6df72f-a6a3-424a-9ede-38b65720d2aa,<p>27</p>23</div>,1.0,yes
