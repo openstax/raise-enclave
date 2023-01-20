@@ -105,7 +105,7 @@ Sample files that can be used as illustrative references can be found in this re
 | id | int | A unique question answer id |
 | question_id | UUID | Question ID that can be joined against `quiz_questions.csv` |
 | text | str | The answer text |
-| grade | float | The percentage of the questions total points received for answering this answer |
+| grade | float | The percentage of the question's total points received for this answer |
 
 ## `users.csv`
 
