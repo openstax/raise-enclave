@@ -28,6 +28,9 @@ Enclave containers can access the following data CSV files:
 * [enrollments.csv](#enrollmentscsv)
 * [grades.csv](#gradescsv)
 * [oneroster_demographics.csv](#oneroster_demographicscsv)
+* [quiz_questions.csv](#quiz_questionscsv)
+* [quiz_question_contents.csv](#quiz_question_contentscsv)
+* [quiz_multichoice_answers.csv](#quiz_multichoice_answercsv)
 * [users.csv](#userscsv)
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
@@ -78,6 +81,32 @@ Sample files that can be used as illustrative references can be found in this re
 | white | str | Value of either `true` or `false` |
 | demographic_race_two_or_more_races | str | Value of either `true` or `false` |
 | hispanic_or_latino_ethnicity | str | Value of either `true` or `false` |
+
+## `quiz_questions.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| assessment_id | int | Assessment ID that can be joined against `assessments.csv` |
+| question_number | int | The relative order number of the question  |
+| question_id | UUID | A unique identifier for the question number |
+
+## `quiz_question_contents.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | UUID | Question ID that can be joined against `quiz_questions.csv` |
+| text | str | The question's text |
+| type | str | The type of question (can be ['multichoice', 'multianswer', 'numerical', 'essay']) |
+
+## `quiz_multichoice_answer.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | int | A unique question answer id |
+| question_id | UUID | Question ID that can be joined against `quiz_questions.csv` |
+| text | str | The answer text |
+| grade | float | The percentage of the question's total points received for this answer |
+| feedback | str | The feedback that gets delivered when this answer is chosen |
 
 ## `users.csv`
 
