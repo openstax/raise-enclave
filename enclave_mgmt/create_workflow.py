@@ -34,7 +34,7 @@ def create_workflow(prefix, image, command):
       {
         "container": {
           "command": command,
-          "image": f"{image}", 
+          "image": image, 
           "args": [], 
           "volumeMounts": [
             {
@@ -65,7 +65,7 @@ def create_workflow(prefix, image, command):
           "command": [
             "bash", 
             "-cxe", 
-            f"aws s3 cp --recursive /data/enclave-output/ s3://raise-data/enclave-outputs/${prefix}\n"
+            f"aws s3 cp --recursive /data/enclave-output/ s3://raise-data/enclave-outputs/{prefix}\n"
           ], 
           "image": "361171574891.dkr.ecr.us-east-1.amazonaws.com/raise-enclave", 
           "volumeMounts": [
