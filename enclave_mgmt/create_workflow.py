@@ -2,13 +2,14 @@ import argparse
 import jinja2
 
 
-def create_workflow(prefix, image, command):
+def create_workflow(prefix, image, command,
+                    output_path='./enclave_mgmt/workflow.yaml'):
 
     environment = jinja2.Environment()
 
     with open('./enclave_mgmt/workflow_template.yaml') as template_file:
         template = environment.from_string(template_file.read())
-        with open('./enclave_mgmt/workflow.yaml', mode='w') as workflow_file:
+        with open(f'{output_path}', mode='w') as workflow_file:
             workflow_file.write(template.render(prefix=prefix,
                                                 image=image, command=command))
 
