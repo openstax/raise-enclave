@@ -2,11 +2,15 @@ from enclave_mgmt import create_workflow
 import yaml
 
 
-def test_compile_workflow(tmp_path):
+def test_compile_workflow(tmp_path, mocker):
 
-    create_workflow.create_workflow('prefix_test', 'image_test',
-                                    '["python",  "./quiz_analyzer.py"]',
-                                    f'{tmp_path}/workflow.yaml')
+    mocker.patch(
+        "sys.argv",
+        ["", 'prefix_test', 'image_test', '["python",  "./quiz_analyzer.py"]',
+         f'{tmp_path}/workflow.yaml']
+    )
+    create_workflow.main()
+
     with open(f'{tmp_path}/workflow.yaml') as f:
         dataMap = yaml.safe_load(f)
 
