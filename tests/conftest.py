@@ -47,9 +47,6 @@ def local_expected_csvs(test_data_path):
         grades = f.readlines()
     with open(test_data_path / "expected/enrollments.csv", 'r') as f:
         enrolments = f.readlines()
-    with open(test_data_path / "expected/oneroster_demographics.csv",
-              'r') as f:
-        or_demographics = f.readlines()
     with open(test_data_path / "expected/courses.csv", 'r') as f:
         courses = f.readlines()
     with open(test_data_path / "expected/quiz_questions.csv", 'r') as f:
@@ -68,7 +65,6 @@ def local_expected_csvs(test_data_path):
         users,
         grades,
         enrolments,
-        or_demographics,
         courses,
         quiz_questions,
         quiz_question_contents,

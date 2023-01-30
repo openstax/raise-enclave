@@ -13,7 +13,6 @@ from pydantic import BaseModel, Extra, validator
 
 MODEL_FILE_USERS = "users.csv"
 MODEL_FILE_COURSES = "courses.csv"
-MODEL_FILE_ONEROSTER_DEMOGRAPHICS = "oneroster_demographics.csv"
 MODEL_FILE_ENROLLMENTS = "enrollments.csv"
 MODEL_FILE_ASSESSMENTS = "assessments.csv"
 MODEL_FILE_GRADES = "grades.csv"
@@ -295,7 +294,6 @@ def create_models(output_path, all_raw_dfs):
 
     clean_raw_df = scrub_raw_dfs(all_raw_dfs)
 
-    demographics_df = demographics_model(clean_raw_df)
     assessments_df, grades_df = assessments_and_grades_model(clean_raw_df)
     users_df = users_model(clean_raw_df)
     enrollments_df = enrollments_model(clean_raw_df)
@@ -304,8 +302,6 @@ def create_models(output_path, all_raw_dfs):
     quiz_question_contents_df = question_contents_model(clean_raw_df)
     quiz_multichoice_answers_df = multichoice_answer_model(clean_raw_df)
 
-    with open(f"{output_path}/{MODEL_FILE_ONEROSTER_DEMOGRAPHICS}", "w") as f:
-        demographics_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
         users_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_FILE_GRADES}", "w") as f:
@@ -424,39 +420,6 @@ def collect_moodle_dfs(bucket, prefix):
     }
 
 
-def collect_oneroster_dfs(bucket, key):
-    s3_client = boto3.client("s3")
-    data = s3_client.get_object(
-        Bucket=bucket,
-        Key=key)
-
-    dfs = {}
-    zipfile_data = data["Body"].read()
-    zf = ZipFile(BytesIO(zipfile_data))
-    for name in zf.namelist():
-        common_types = {
-            'sourcedId': str
-        }
-        if name == 'demographics.csv':
-            types = common_types | {
-                'americanIndianOrAlaskaNative': str,
-                'asian': str,
-                'blackOrAfricanAmerican': str,
-                'nativeHawaiianOrOtherPacificIslander': str,
-                'white': str,
-                'demographicRaceTwoOrMoreRaces': str,
-                'hispanicOrLatinoEthnicity': str
-                }
-            dfs[name] = pd.read_csv(BytesIO(zf.read(name)), dtype=types)
-        else:
-            dfs[name] = pd.read_csv(BytesIO(zf.read(name)), dtype=common_types)
-
-    return {
-        'demographics': dfs['demographics.csv'],
-        'or_users': dfs['users.csv']
-    }
-
-
 def collect_quiz_dfs(bucket, key):
     key_questions = key + "/content/quiz_questions.csv"
     key_question_contents = key + "/content/quiz_question_contents.csv"
@@ -490,14 +453,10 @@ def collect_quiz_dfs(bucket, key):
 
 def compile_models(
     data_bucket,
-    data_key,
-    oneroster_bucket,
-    oneroster_key
-):
-    oneroster_dfs = collect_oneroster_dfs(oneroster_bucket, oneroster_key)
+    data_key):
     moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
     quiz_data_dfs = collect_quiz_dfs(data_bucket, data_key)
-    all_raw_dfs = oneroster_dfs | moodle_dfs | quiz_data_dfs
+    all_raw_dfs = moodle_dfs | quiz_data_dfs
     return all_raw_dfs
 
 
@@ -507,19 +466,13 @@ def main():
                         help='bucket for the moodle grade and user data dirs')
     parser.add_argument('data_prefix', type=str,
                         help='prefix for the moodle grade and user data dirs')
-    parser.add_argument('oneroster_bucket', type=str,
-                        help='bucket for oneroster data')
-    parser.add_argument('oneroster_key', type=str,
-                        help='key + filename for one roster data')
     args = parser.parse_args()
 
     output_path = os.environ["CSV_OUTPUT_DIR"]
 
     all_raw_dfs = compile_models(
         args.data_bucket,
-        args.data_prefix,
-        args.oneroster_bucket,
-        args.oneroster_key)
+        args.data_prefix)
 
     create_models(output_path, all_raw_dfs)
 

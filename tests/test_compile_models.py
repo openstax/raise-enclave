@@ -111,7 +111,7 @@ def test_compile_models(
 
     mocker.patch(
         "sys.argv",
-        ["", data_bucket_name, data_key, zip_bucket_name, zip_key]
+        ["", data_bucket_name, data_key]
     )
     compile_models.main()
 
@@ -121,7 +121,6 @@ def test_compile_models(
      expected_users,
      expected_grades,
      expected_enrollments,
-     expected_or_demographics,
      expected_courses,
      expected_quiz_questions,
      expected_quiz_question_contents,
@@ -142,10 +141,6 @@ def test_compile_models(
         for i in expected_enrollments:
             assert i in results
 
-    with open(tmp_path / "oneroster_demographics.csv", 'r') as f:
-        results = f.readlines()
-        for i in expected_or_demographics:
-            assert i in results
 
     with open(tmp_path / "courses.csv", 'r') as f:
         results = f.readlines()
