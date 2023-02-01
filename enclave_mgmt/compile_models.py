@@ -8,7 +8,6 @@ import boto3
 import argparse
 import pandas as pd
 from io import BytesIO
-from zipfile import ZipFile
 from pydantic import BaseModel, Extra, validator
 
 MODEL_FILE_USERS = "users.csv"
@@ -272,18 +271,14 @@ def demographics_model(all_raw_dfs):
 
 
 def scrub_raw_dfs(all_raw_dfs):
-    or_users_df = all_raw_dfs['or_users']
     moodle_users_df = all_raw_dfs['moodle_users']
 
-    or_users_df['email'] = or_users_df['email'].apply(
-        lambda col: col.lower())
     moodle_users_df['email'] = moodle_users_df['email'].apply(
         lambda col: col.lower())
 
     grade_df = all_raw_dfs['grades']
     grade_df = grade_df[grade_df['assessment_name'].notnull()]
 
-    all_raw_dfs['or_users'] = or_users_df
     all_raw_dfs['moodle_users'] = moodle_users_df
     all_raw_dfs['grades'] = grade_df
 
@@ -451,9 +446,7 @@ def collect_quiz_dfs(bucket, key):
             "quiz_multichoice_answers": quiz_multichoice_answers_data}
 
 
-def compile_models(
-    data_bucket,
-    data_key):
+def compile_models(data_bucket, data_key):
     moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
     quiz_data_dfs = collect_quiz_dfs(data_bucket, data_key)
     all_raw_dfs = moodle_dfs | quiz_data_dfs
