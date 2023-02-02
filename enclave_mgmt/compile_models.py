@@ -230,46 +230,6 @@ def assessments_and_grades_model(clean_raw_df):
     return assessments_df, grades_df
 
 
-def demographics_model(all_raw_dfs):
-
-    demographic_df = all_raw_dfs['demographics']
-
-    demographic_df.rename(
-        columns={
-            'birthDate':
-            'birth_date',
-            'americanIndianOrAlaskaNative':
-            'american_indian_or_alaska_native',
-            'blackOrAfricanAmerican':
-            'black_or_african_american',
-            'nativeHawaiianOrOtherPacificIslander':
-            'native_hawaiian_or_other_pacific_islander',
-            'demographicRaceTwoOrMoreRaces':
-            'demographic_race_two_or_more_races',
-            'hispanicOrLatinoEthnicity':
-            'hispanic_or_latino_ethnicity'
-        }, inplace=True)
-
-    id_2_email = all_raw_dfs['or_users'][['email', 'sourcedId']]
-    demographic_df = pd.merge(id_2_email, demographic_df, on='sourcedId')
-    email_2_uuid = all_raw_dfs['moodle_users'][['email', 'uuid']]
-    demographic_df = pd.merge(email_2_uuid, demographic_df, on='email')
-
-    demographic_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
-
-    demographic_df = demographic_df[
-        ['user_uuid', 'birth_date', 'sex',
-         'american_indian_or_alaska_native', 'asian',
-         'black_or_african_american',
-         'native_hawaiian_or_other_pacific_islander', 'white',
-         'demographic_race_two_or_more_races', 'hispanic_or_latino_ethnicity']]
-
-    for item in demographic_df.to_dict(orient='records'):
-        Demographic.parse_obj(item)
-
-    return demographic_df
-
-
 def scrub_raw_dfs(all_raw_dfs):
     moodle_users_df = all_raw_dfs['moodle_users']
 
