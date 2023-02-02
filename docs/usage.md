@@ -27,7 +27,6 @@ Enclave containers can access the following data CSV files:
 * [courses.csv](#coursescsv)
 * [enrollments.csv](#enrollmentscsv)
 * [grades.csv](#gradescsv)
-* [oneroster_demographics.csv](#oneroster_demographicscsv)
 * [quiz_questions.csv](#quiz_questionscsv)
 * [quiz_question_contents.csv](#quiz_question_contentscsv)
 * [quiz_multichoice_answers.csv](#quiz_multichoice_answercsv)
@@ -67,20 +66,7 @@ Sample files that can be used as illustrative references can be found in this re
 | grade_percentage | float | A value between 0 and 100 that reflects in the course gradebook |
 | time_submitted | int | A Unix timestamp value that reflects when the grade was created |
 
-## `oneroster_demographics.csv`
 
-| Column | Type | Notes |
-| - | - | - |
-| user_uuid | UUID | User UUID that can be joined against `users.csv` |
-| birth_date | data | ISO8601 date string (YYYY-MM-DD) |
-| sex | str | Value of either `male` or `female`
-| american_indian_or_alaska_native | str | Value of either `true` or `false` |
-| asian | str | Value of either `true` or `false` |
-| black_or_african_american | str | Value of either `true` or `false` |
-| native_hawaiian_or_other_pacific_islander | str | Value of either `true` or `false` |
-| white | str | Value of either `true` or `false` |
-| demographic_race_two_or_more_races | str | Value of either `true` or `false` |
-| hispanic_or_latino_ethnicity | str | Value of either `true` or `false` |
 
 ## `quiz_questions.csv`
 

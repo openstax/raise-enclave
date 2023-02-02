@@ -8,12 +8,10 @@ import boto3
 import argparse
 import pandas as pd
 from io import BytesIO
-from zipfile import ZipFile
 from pydantic import BaseModel, Extra, validator
 
 MODEL_FILE_USERS = "users.csv"
 MODEL_FILE_COURSES = "courses.csv"
-MODEL_FILE_ONEROSTER_DEMOGRAPHICS = "oneroster_demographics.csv"
 MODEL_FILE_ENROLLMENTS = "enrollments.csv"
 MODEL_FILE_ASSESSMENTS = "assessments.csv"
 MODEL_FILE_GRADES = "grades.csv"
@@ -232,59 +230,15 @@ def assessments_and_grades_model(clean_raw_df):
     return assessments_df, grades_df
 
 
-def demographics_model(all_raw_dfs):
-
-    demographic_df = all_raw_dfs['demographics']
-
-    demographic_df.rename(
-        columns={
-            'birthDate':
-            'birth_date',
-            'americanIndianOrAlaskaNative':
-            'american_indian_or_alaska_native',
-            'blackOrAfricanAmerican':
-            'black_or_african_american',
-            'nativeHawaiianOrOtherPacificIslander':
-            'native_hawaiian_or_other_pacific_islander',
-            'demographicRaceTwoOrMoreRaces':
-            'demographic_race_two_or_more_races',
-            'hispanicOrLatinoEthnicity':
-            'hispanic_or_latino_ethnicity'
-        }, inplace=True)
-
-    id_2_email = all_raw_dfs['or_users'][['email', 'sourcedId']]
-    demographic_df = pd.merge(id_2_email, demographic_df, on='sourcedId')
-    email_2_uuid = all_raw_dfs['moodle_users'][['email', 'uuid']]
-    demographic_df = pd.merge(email_2_uuid, demographic_df, on='email')
-
-    demographic_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
-
-    demographic_df = demographic_df[
-        ['user_uuid', 'birth_date', 'sex',
-         'american_indian_or_alaska_native', 'asian',
-         'black_or_african_american',
-         'native_hawaiian_or_other_pacific_islander', 'white',
-         'demographic_race_two_or_more_races', 'hispanic_or_latino_ethnicity']]
-
-    for item in demographic_df.to_dict(orient='records'):
-        Demographic.parse_obj(item)
-
-    return demographic_df
-
-
 def scrub_raw_dfs(all_raw_dfs):
-    or_users_df = all_raw_dfs['or_users']
     moodle_users_df = all_raw_dfs['moodle_users']
 
-    or_users_df['email'] = or_users_df['email'].apply(
-        lambda col: col.lower())
     moodle_users_df['email'] = moodle_users_df['email'].apply(
         lambda col: col.lower())
 
     grade_df = all_raw_dfs['grades']
     grade_df = grade_df[grade_df['assessment_name'].notnull()]
 
-    all_raw_dfs['or_users'] = or_users_df
     all_raw_dfs['moodle_users'] = moodle_users_df
     all_raw_dfs['grades'] = grade_df
 
@@ -295,7 +249,6 @@ def create_models(output_path, all_raw_dfs):
 
     clean_raw_df = scrub_raw_dfs(all_raw_dfs)
 
-    demographics_df = demographics_model(clean_raw_df)
     assessments_df, grades_df = assessments_and_grades_model(clean_raw_df)
     users_df = users_model(clean_raw_df)
     enrollments_df = enrollments_model(clean_raw_df)
@@ -304,8 +257,6 @@ def create_models(output_path, all_raw_dfs):
     quiz_question_contents_df = question_contents_model(clean_raw_df)
     quiz_multichoice_answers_df = multichoice_answer_model(clean_raw_df)
 
-    with open(f"{output_path}/{MODEL_FILE_ONEROSTER_DEMOGRAPHICS}", "w") as f:
-        demographics_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
         users_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_FILE_GRADES}", "w") as f:
@@ -424,39 +375,6 @@ def collect_moodle_dfs(bucket, prefix):
     }
 
 
-def collect_oneroster_dfs(bucket, key):
-    s3_client = boto3.client("s3")
-    data = s3_client.get_object(
-        Bucket=bucket,
-        Key=key)
-
-    dfs = {}
-    zipfile_data = data["Body"].read()
-    zf = ZipFile(BytesIO(zipfile_data))
-    for name in zf.namelist():
-        common_types = {
-            'sourcedId': str
-        }
-        if name == 'demographics.csv':
-            types = common_types | {
-                'americanIndianOrAlaskaNative': str,
-                'asian': str,
-                'blackOrAfricanAmerican': str,
-                'nativeHawaiianOrOtherPacificIslander': str,
-                'white': str,
-                'demographicRaceTwoOrMoreRaces': str,
-                'hispanicOrLatinoEthnicity': str
-                }
-            dfs[name] = pd.read_csv(BytesIO(zf.read(name)), dtype=types)
-        else:
-            dfs[name] = pd.read_csv(BytesIO(zf.read(name)), dtype=common_types)
-
-    return {
-        'demographics': dfs['demographics.csv'],
-        'or_users': dfs['users.csv']
-    }
-
-
 def collect_quiz_dfs(bucket, key):
     key_questions = key + "/content/quiz_questions.csv"
     key_question_contents = key + "/content/quiz_question_contents.csv"
@@ -488,16 +406,10 @@ def collect_quiz_dfs(bucket, key):
             "quiz_multichoice_answers": quiz_multichoice_answers_data}
 
 
-def compile_models(
-    data_bucket,
-    data_key,
-    oneroster_bucket,
-    oneroster_key
-):
-    oneroster_dfs = collect_oneroster_dfs(oneroster_bucket, oneroster_key)
+def compile_models(data_bucket, data_key):
     moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
     quiz_data_dfs = collect_quiz_dfs(data_bucket, data_key)
-    all_raw_dfs = oneroster_dfs | moodle_dfs | quiz_data_dfs
+    all_raw_dfs = moodle_dfs | quiz_data_dfs
     return all_raw_dfs
 
 
@@ -507,19 +419,13 @@ def main():
                         help='bucket for the moodle grade and user data dirs')
     parser.add_argument('data_prefix', type=str,
                         help='prefix for the moodle grade and user data dirs')
-    parser.add_argument('oneroster_bucket', type=str,
-                        help='bucket for oneroster data')
-    parser.add_argument('oneroster_key', type=str,
-                        help='key + filename for one roster data')
     args = parser.parse_args()
 
     output_path = os.environ["CSV_OUTPUT_DIR"]
 
     all_raw_dfs = compile_models(
         args.data_bucket,
-        args.data_prefix,
-        args.oneroster_bucket,
-        args.oneroster_key)
+        args.data_prefix)
 
     create_models(output_path, all_raw_dfs)
 
