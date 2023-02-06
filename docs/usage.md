@@ -13,7 +13,10 @@ The contract between the runtime and any container is fairly straight forward:
 
 * Input data is staged at a path exposed via the `DATA_INPUT_DIR` environment variable. Users can read the environment variable and append the relative path for any input files necessary for analysis.
 
-* Analysis outputs should be written to the path exposed via the `RESULT_OUTPUT_DIR` environment variable. Any files written outside of this path will be lost at the end of the execution. Any files written to this path will also be subject to review.
+* Analysis outputs should be written to the path exposed via the `RESULT_OUTPUT_DIR` environment variable. Any files written outside of this path will be lost at the end of the execution. Any files written to this path will also be subject to review. Only the following file types are currently allowed / supported (files of any other type will be redacted from the output as part of review):
+    * CSV
+    * PNG / JPG
+    * PDF
 
 A relatively trivial example of an analysis can be found in this repo [here](../examples/quiz-analyzer).
 
