@@ -11,10 +11,6 @@ def test_data_path():
 
 @pytest.fixture
 def local_file_collections(test_data_path):
-    with open(test_data_path / "users.csv", "r") as f:
-        or_users = f.read()
-    with open(test_data_path / "demographics.csv", 'r') as f:
-        or_dems = f.read()
     with open(test_data_path / "users.json", "r") as f:
         moodle_users = json.load(f)
     with open(test_data_path / "grades.json", 'r') as f:
@@ -27,8 +23,6 @@ def local_file_collections(test_data_path):
         quiz_multichoice_answers = f.read()
 
     return (
-        or_users,
-        or_dems,
         moodle_grades,
         moodle_users,
         quiz_questions,
@@ -47,9 +41,6 @@ def local_expected_csvs(test_data_path):
         grades = f.readlines()
     with open(test_data_path / "expected/enrollments.csv", 'r') as f:
         enrolments = f.readlines()
-    with open(test_data_path / "expected/oneroster_demographics.csv",
-              'r') as f:
-        or_demographics = f.readlines()
     with open(test_data_path / "expected/courses.csv", 'r') as f:
         courses = f.readlines()
     with open(test_data_path / "expected/quiz_questions.csv", 'r') as f:
@@ -68,7 +59,6 @@ def local_expected_csvs(test_data_path):
         users,
         grades,
         enrolments,
-        or_demographics,
         courses,
         quiz_questions,
         quiz_question_contents,
