@@ -32,7 +32,7 @@ Enclave containers can access the following data CSV files:
 * [grades.csv](#gradescsv)
 * [quiz_questions.csv](#quiz_questionscsv)
 * [quiz_question_contents.csv](#quiz_question_contentscsv)
-* [quiz_multichoice_answers.csv](#quiz_multichoice_answercsv)
+* [quiz_multichoice_answers.csv](#quiz_multichoice_answerscsv)
 * [users.csv](#userscsv)
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
@@ -67,7 +67,7 @@ Sample files that can be used as illustrative references can be found in this re
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | grade_percentage | float | A value between 0 and 100 that reflects in the course gradebook |
-| time_submitted | int | A Unix timestamp value that reflects when the grade was created |
+| time_submitted | int | A Unix timestamp value that reflects when the grade was created (seconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
 
 
 
@@ -87,7 +87,7 @@ Sample files that can be used as illustrative references can be found in this re
 | text | str | The question's text |
 | type | str | The type of question (can be ['multichoice', 'multianswer', 'numerical', 'essay']) |
 
-## `quiz_multichoice_answer.csv`
+## `quiz_multichoice_answers.csv`
 
 | Column | Type | Notes |
 | - | - | - |
