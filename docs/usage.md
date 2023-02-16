@@ -69,21 +69,19 @@ Sample files that can be used as illustrative references can be found in this re
 | grade_percentage | float | A value between 0 and 100 that reflects in the course gradebook |
 | time_submitted | int | A Unix timestamp value that reflects when the grade was created (seconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
 
-
-
 ## `quiz_questions.csv`
 
 | Column | Type | Notes |
 | - | - | - |
 | assessment_id | int | Assessment ID that can be joined against `assessments.csv` |
 | question_number | int | The relative order number of the question  |
-| question_id | UUID | A unique identifier for the question number |
+| question_id | UUID | Question ID that can be joined against `quiz_question_contents.csv` (multiple quizzes can reference the same question) |
 
 ## `quiz_question_contents.csv`
 
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | Question ID that can be joined against `quiz_questions.csv` |
+| id | UUID | A unique identifier for the question |
 | text | str | The question's text |
 | type | str | The type of question (can be ['multichoice', 'multianswer', 'numerical', 'essay']) |
 
@@ -92,7 +90,7 @@ Sample files that can be used as illustrative references can be found in this re
 | Column | Type | Notes |
 | - | - | - |
 | id | int | A unique question answer id |
-| question_id | UUID | Question ID that can be joined against `quiz_questions.csv` |
+| question_id | UUID | Question ID that can be joined against `quiz_question_contents.csv` |
 | text | str | The answer text |
 | grade | float | The percentage of the question's total points received for this answer |
 | feedback | str | The feedback that gets delivered when this answer is chosen |
