@@ -13,7 +13,10 @@ The contract between the runtime and any container is fairly straight forward:
 
 * Input data is staged at a path exposed via the `DATA_INPUT_DIR` environment variable. Users can read the environment variable and append the relative path for any input files necessary for analysis.
 
-* Analysis outputs should be written to the path exposed via the `RESULT_OUTPUT_DIR` environment variable. Any files written outside of this path will be lost at the end of the execution. Any files written to this path will also be subject to review.
+* Analysis outputs should be written to the path exposed via the `RESULT_OUTPUT_DIR` environment variable. Any files written outside of this path will be lost at the end of the execution. Any files written to this path will also be subject to review. Only the following file types are currently allowed / supported (files of any other type will be redacted from the output as part of review):
+    * CSV
+    * PNG / JPG
+    * PDF
 
 A relatively trivial example of an analysis can be found in this repo [here](../examples/quiz-analyzer).
 
@@ -29,7 +32,7 @@ Enclave containers can access the following data CSV files:
 * [grades.csv](#gradescsv)
 * [quiz_questions.csv](#quiz_questionscsv)
 * [quiz_question_contents.csv](#quiz_question_contentscsv)
-* [quiz_multichoice_answers.csv](#quiz_multichoice_answercsv)
+* [quiz_multichoice_answers.csv](#quiz_multichoice_answerscsv)
 * [users.csv](#userscsv)
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
@@ -64,9 +67,7 @@ Sample files that can be used as illustrative references can be found in this re
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | grade_percentage | float | A value between 0 and 100 that reflects in the course gradebook |
-| time_submitted | int | A Unix timestamp value that reflects when the grade was created |
-
-
+| time_submitted | int | A Unix timestamp value that reflects when the grade was created (seconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
 
 ## `quiz_questions.csv`
 
@@ -74,22 +75,22 @@ Sample files that can be used as illustrative references can be found in this re
 | - | - | - |
 | assessment_id | int | Assessment ID that can be joined against `assessments.csv` |
 | question_number | int | The relative order number of the question  |
-| question_id | UUID | A unique identifier for the question number |
+| question_id | UUID | Question ID that can be joined against `quiz_question_contents.csv` (multiple quizzes can reference the same question) |
 
 ## `quiz_question_contents.csv`
 
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | Question ID that can be joined against `quiz_questions.csv` |
+| id | UUID | A unique identifier for the question |
 | text | str | The question's text |
 | type | str | The type of question (can be ['multichoice', 'multianswer', 'numerical', 'essay']) |
 
-## `quiz_multichoice_answer.csv`
+## `quiz_multichoice_answers.csv`
 
 | Column | Type | Notes |
 | - | - | - |
 | id | int | A unique question answer id |
-| question_id | UUID | Question ID that can be joined against `quiz_questions.csv` |
+| question_id | UUID | Question ID that can be joined against `quiz_question_contents.csv` |
 | text | str | The answer text |
 | grade | float | The percentage of the question's total points received for this answer |
 | feedback | str | The feedback that gets delivered when this answer is chosen |
