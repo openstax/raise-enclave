@@ -330,7 +330,7 @@ def generate_users_df(users_dict):
                     "last_name": user['lastname'],
                     "email": user_email,
                     "user_id": user['id'],
-                    "uuid": uuid4()
+                    "uuid": user['uuid'] or uuid4()
                 })
     return pd.DataFrame(user_data)
 
