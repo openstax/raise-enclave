@@ -375,10 +375,12 @@ def collect_moodle_dfs(bucket, prefix):
     }
 
 
-def collect_quiz_dfs(bucket, key):
+def collect_content_dfs(bucket, key):
     key_questions = key + "/content/quiz_questions.csv"
     key_question_contents = key + "/content/quiz_question_contents.csv"
     key_multichoice_answers = key + "/content/quiz_multichoice_answers.csv"
+    key_ib_input_instances = key + "/content/ib_input_instances.csv"
+    key_ib_pset_problems = key + "/content/ib_pset_problems.csv"
 
     s3_client = boto3.client("s3")
     quiz_question_stream = s3_client.get_object(
@@ -390,6 +392,12 @@ def collect_quiz_dfs(bucket, key):
     quiz_multichoice_answers_stream = s3_client.get_object(
         Bucket=bucket,
         Key=key_multichoice_answers)
+    ib_input_instances_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_ib_input_instances)
+    ib_pset_problems_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_ib_pset_problems)
 
     quiz_question_data = pd.read_csv(
         BytesIO(quiz_question_stream["Body"].read())
@@ -400,16 +408,24 @@ def collect_quiz_dfs(bucket, key):
     quiz_multichoice_answers_data = pd.read_csv(
         BytesIO(quiz_multichoice_answers_stream["Body"].read()),
     )
-
+    ib_input_instances_data = pd.read_csv(
+        BytesIO(ib_input_instances_stream["Body"].read()),
+    )
+    ib_pset_problems_data = pd.read_csv(
+        BytesIO(ib_pset_problems_stream["Body"].read()),
+    )
     return {"quiz_questions": quiz_question_data,
             "quiz_question_contents": quiz_question_contents_data,
-            "quiz_multichoice_answers": quiz_multichoice_answers_data}
+            "quiz_multichoice_answers": quiz_multichoice_answers_data,
+            "ib_input_instances": ib_input_instances_data,
+            "ib_pset_problems": ib_pset_problems_data
+            }
 
 
 def compile_models(data_bucket, data_key):
     moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
-    quiz_data_dfs = collect_quiz_dfs(data_bucket, data_key)
-    all_raw_dfs = moodle_dfs | quiz_data_dfs
+    content_dfs = collect_content_dfs(data_bucket, data_key)
+    all_raw_dfs = moodle_dfs | content_dfs
     return all_raw_dfs
 
 

@@ -19,7 +19,9 @@ def test_compile_models(
 
     (moodle_grades, moodle_users,
         quiz_questions, quiz_question_contents,
-        quiz_multichoice_answers) = local_file_collections
+        quiz_multichoice_answers,
+        ib_input_instances,
+        ib_pset_problems) = local_file_collections
 
     s3_client = boto3.client('s3')
     stubber_client = Stubber(s3_client)
@@ -88,6 +90,24 @@ def test_compile_models(
             }
         )
 
+    body = io.BytesIO(ib_input_instances.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/ib_input_instances.csv"
+            }
+        )
+
+    body = io.BytesIO(ib_pset_problems.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/ib_pset_problems.csv"
+            }
+        )
+
     stubber_client.activate()
     mocker.patch('boto3.client', lambda service: s3_client)
 
@@ -106,7 +126,9 @@ def test_compile_models(
      expected_courses,
      expected_quiz_questions,
      expected_quiz_question_contents,
-     expected_quiz_multichoice_answers) = local_expected_csvs
+     expected_quiz_multichoice_answers,
+     ib_input_instances,
+     ib_pset_problems) = local_expected_csvs
 
     with open(tmp_path / "assessments.csv", 'r') as f:
         results = f.readlines()
