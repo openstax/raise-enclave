@@ -34,7 +34,10 @@ Enclave containers can access the following data CSV files:
 * [quiz_question_contents.csv](#quiz_question_contentscsv)
 * [quiz_multichoice_answers.csv](#quiz_multichoice_answerscsv)
 * [users.csv](#userscsv)
+* [ib_input_instances.csv](#ibinputinstancescsv)
+* [ib_pset_problems.csv](#ibpsetproblemscsv)
 
+ib_pset_problems
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
 
 ## `assessments.csv`
@@ -103,6 +106,28 @@ Sample files that can be used as illustrative references can be found in this re
 | first_name | str | User's first name |
 | last_name | str | User's last name |
 | email | str | User's email |
+
+## `ib_input_instances.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | UUID | The value of the data-content-id |
+| content_id | UUID | Content page UUID |
+| variant | str | Variant name |
+| content | str | Input content |
+| prompt | str | Prompt content |
+
+## `ib_pset_problems.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | UUID | The value of the data-content-id |
+| content_id | UUID |  Content page UUID |
+| variant | str | Variant name |
+| content | str | Problem content |
+| problem_type | str | Problem type |
+| solution | str | Solution string for problem |
+| solution_options | str | Solution options for problem |
 
 ## Development and testing
 
