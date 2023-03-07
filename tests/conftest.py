@@ -2,6 +2,7 @@ from pathlib import Path
 from uuid import UUID
 import pytest
 import json
+import csv
 
 
 @pytest.fixture
@@ -39,29 +40,30 @@ def local_file_collections(test_data_path):
 @pytest.fixture
 def local_expected_csvs(test_data_path):
     with open(test_data_path / "expected/assessments.csv", "r") as f:
-        assessments = f.readlines()
+        assessments = list(csv.DictReader(f))
     with open(test_data_path / "expected/users.csv", 'r') as f:
-        users = f.readlines()
+        users = list(csv.DictReader(f))
     with open(test_data_path / "expected/grades.csv", "r") as f:
-        grades = f.readlines()
+        grades = list(csv.DictReader(f))
     with open(test_data_path / "expected/enrollments.csv", 'r') as f:
-        enrolments = f.readlines()
+        enrolments = list(csv.DictReader(f))
     with open(test_data_path / "expected/courses.csv", 'r') as f:
-        courses = f.readlines()
+        courses = list(csv.DictReader(f))
     with open(test_data_path / "expected/quiz_questions.csv", 'r') as f:
-        quiz_questions = f.readlines()
+        quiz_questions = list(csv.DictReader(f))
     with open(
         test_data_path / "expected/quiz_question_contents.csv", 'r'
     ) as f:
-        quiz_question_contents = f.readlines()
+        quiz_question_contents = list(csv.DictReader(f))
     with open(
         test_data_path / "expected/quiz_multichoice_answers.csv", 'r'
     ) as f:
-        quiz_multichoice_answers = f.readlines()
+        quiz_multichoice_answers = list(csv.DictReader(f))
     with open(test_data_path / "expected/ib_input_instances.csv", 'r') as f:
-        ib_input_instances = f.read()
+        ib_input_instances = list(csv.DictReader(f))
     with open(test_data_path / "expected/ib_pset_problems.csv", 'r') as f:
-        ib_pset_problems = f.read()
+        ib_pset_problems = list(csv.DictReader(f))
+
     return (
         assessments,
         users,

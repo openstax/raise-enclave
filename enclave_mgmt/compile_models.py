@@ -18,6 +18,8 @@ MODEL_FILE_GRADES = "grades.csv"
 MODEL_QUIZ_QUESTIONS = "quiz_questions.csv"
 MODEL_QUIZ_QUESTION_CONTENTS = "quiz_question_contents.csv"
 MODEL_MULTICHOICE_ANSWERS = "quiz_multichoice_answers.csv"
+MODEL_INPUT_INSTANCES = "ib_input_instances.csv"
+MODEL_PSET_PROBLEMS = "ib_pset_problems.csv"
 
 
 class Demographic(BaseModel):
@@ -119,6 +121,31 @@ class QuizMultichoiceAnswer(BaseModel):
     text: str
     grade: float
     feedback: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class InputInteractiveBlock(BaseModel):
+    id: UUID
+    content_id: UUID
+    variant: str
+    content: str
+    prompt: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class ProblemSetProblem(BaseModel):
+    id: UUID
+    content_id: UUID
+    variant: str
+    pset_id: UUID
+    content: str
+    problem_type: str
+    solution: str
+    solution_options: str
 
     class Config:
         extra = Extra.forbid
@@ -230,6 +257,39 @@ def assessments_and_grades_model(clean_raw_df):
     return assessments_df, grades_df
 
 
+def ib_input_model(clean_raw_df):
+    ib_input_df = clean_raw_df['ib_input_instances']
+    ib_input_df = ib_input_df[
+                ['id',
+                 'content_id',
+                 'variant',
+                 'content',
+                 'prompt']]
+
+    for item in ib_input_df.to_dict(orient='records'):
+        InputInteractiveBlock.parse_obj(item)
+
+    return ib_input_df
+
+
+def ib_problem_model(clean_raw_df):
+    ib_problem_df = clean_raw_df['ib_pset_problems']
+    ib_problem_df = ib_problem_df[
+                  ['id',
+                   'content_id',
+                   'variant',
+                   'pset_id',
+                   'content',
+                   'problem_type',
+                   'solution',
+                   'solution_options']]
+
+    for item in ib_problem_df.to_dict(orient='records'):
+        ProblemSetProblem.parse_obj(item)
+
+    return ib_problem_df
+
+
 def scrub_raw_dfs(all_raw_dfs):
     moodle_users_df = all_raw_dfs['moodle_users']
 
@@ -241,7 +301,6 @@ def scrub_raw_dfs(all_raw_dfs):
 
     all_raw_dfs['moodle_users'] = moodle_users_df
     all_raw_dfs['grades'] = grade_df
-
     return all_raw_dfs
 
 
@@ -256,6 +315,8 @@ def create_models(output_path, all_raw_dfs):
     quiz_questions_df = questions_model(clean_raw_df, assessments_df)
     quiz_question_contents_df = question_contents_model(clean_raw_df)
     quiz_multichoice_answers_df = multichoice_answer_model(clean_raw_df)
+    ib_input_df = ib_input_model(clean_raw_df)
+    ib_problem_df = ib_problem_model(clean_raw_df)
 
     with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
         users_df.to_csv(f, index=False)
@@ -273,6 +334,10 @@ def create_models(output_path, all_raw_dfs):
         quiz_question_contents_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_MULTICHOICE_ANSWERS}", "w") as f:
         quiz_multichoice_answers_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_INPUT_INSTANCES}", "w") as f:
+        ib_input_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_PSET_PROBLEMS}", "w") as f:
+        ib_problem_df.to_csv(f, index=False)
 
 
 def generate_grade_df(grade_dict):
