@@ -76,7 +76,7 @@ Sample files that can be used as illustrative references can be found in this re
 
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | A unique UUID value that is assigned to the problem interactive |
+| id | UUID | A unique UUID value that is assigned to the input interactive |
 | content_id | UUID | Content page UUID |
 | variant | str | Variant name |
 | content | str | Input content |
