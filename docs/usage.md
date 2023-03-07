@@ -89,6 +89,7 @@ Sample files that can be used as illustrative references can be found in this re
 | id | UUID | A unique UUID value that is assigned to the problem interactive |
 | content_id | UUID |  Content page UUID |
 | variant | str | Variant name |
+| pset_id | UUID | A unique UUID value of the problem set|
 | content | str | Problem content |
 | problem_type | str | Problem type (one of 'input', 'dropdown', 'multiselect', or 'multiplechoice')|
 | solution | str | Solution string for problem |

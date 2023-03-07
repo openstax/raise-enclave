@@ -143,7 +143,7 @@ class ProblemSetProblem(BaseModel):
     variant: str
     pset_id: UUID
     content: str
-    problem_type: str
+    problem_type: Literal['input', 'dropdown', 'multiselect', 'multiplechoice']
     solution: str
     solution_options: str
 
