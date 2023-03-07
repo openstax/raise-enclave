@@ -91,7 +91,7 @@ Sample files that can be used as illustrative references can be found in this re
 | variant | str | Variant name |
 | pset_id | UUID | A unique UUID value of the problem set|
 | content | str | Problem content |
-| problem_type | Literal | Problem type (one of 'input', 'dropdown', 'multiselect', or 'multiplechoice')|
+| problem_type | str | Problem type (one of 'input', 'dropdown', 'multiselect', or 'multiplechoice')|
 | solution | str | Solution string for problem |
 | solution_options | str | Solution options for problem |
 
