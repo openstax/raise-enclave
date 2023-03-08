@@ -18,6 +18,8 @@ MODEL_FILE_GRADES = "grades.csv"
 MODEL_QUIZ_QUESTIONS = "quiz_questions.csv"
 MODEL_QUIZ_QUESTION_CONTENTS = "quiz_question_contents.csv"
 MODEL_MULTICHOICE_ANSWERS = "quiz_multichoice_answers.csv"
+MODEL_INPUT_INSTANCES = "ib_input_instances.csv"
+MODEL_PSET_PROBLEMS = "ib_pset_problems.csv"
 
 
 class Demographic(BaseModel):
@@ -119,6 +121,31 @@ class QuizMultichoiceAnswer(BaseModel):
     text: str
     grade: float
     feedback: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class InputInteractiveBlock(BaseModel):
+    id: UUID
+    content_id: UUID
+    variant: str
+    content: str
+    prompt: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class ProblemSetProblem(BaseModel):
+    id: UUID
+    content_id: UUID
+    variant: str
+    pset_id: UUID
+    content: str
+    problem_type: Literal['input', 'dropdown', 'multiselect', 'multiplechoice']
+    solution: str
+    solution_options: str
 
     class Config:
         extra = Extra.forbid
@@ -230,6 +257,39 @@ def assessments_and_grades_model(clean_raw_df):
     return assessments_df, grades_df
 
 
+def ib_input_model(clean_raw_df):
+    ib_input_df = clean_raw_df['ib_input_instances']
+    ib_input_df = ib_input_df[
+                ['id',
+                 'content_id',
+                 'variant',
+                 'content',
+                 'prompt']]
+
+    for item in ib_input_df.to_dict(orient='records'):
+        InputInteractiveBlock.parse_obj(item)
+
+    return ib_input_df
+
+
+def ib_problem_model(clean_raw_df):
+    ib_problem_df = clean_raw_df['ib_pset_problems']
+    ib_problem_df = ib_problem_df[
+                  ['id',
+                   'content_id',
+                   'variant',
+                   'pset_id',
+                   'content',
+                   'problem_type',
+                   'solution',
+                   'solution_options']]
+
+    for item in ib_problem_df.to_dict(orient='records'):
+        ProblemSetProblem.parse_obj(item)
+
+    return ib_problem_df
+
+
 def scrub_raw_dfs(all_raw_dfs):
     moodle_users_df = all_raw_dfs['moodle_users']
 
@@ -241,7 +301,6 @@ def scrub_raw_dfs(all_raw_dfs):
 
     all_raw_dfs['moodle_users'] = moodle_users_df
     all_raw_dfs['grades'] = grade_df
-
     return all_raw_dfs
 
 
@@ -256,6 +315,8 @@ def create_models(output_path, all_raw_dfs):
     quiz_questions_df = questions_model(clean_raw_df, assessments_df)
     quiz_question_contents_df = question_contents_model(clean_raw_df)
     quiz_multichoice_answers_df = multichoice_answer_model(clean_raw_df)
+    ib_input_df = ib_input_model(clean_raw_df)
+    ib_problem_df = ib_problem_model(clean_raw_df)
 
     with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
         users_df.to_csv(f, index=False)
@@ -273,6 +334,10 @@ def create_models(output_path, all_raw_dfs):
         quiz_question_contents_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_MULTICHOICE_ANSWERS}", "w") as f:
         quiz_multichoice_answers_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_INPUT_INSTANCES}", "w") as f:
+        ib_input_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_PSET_PROBLEMS}", "w") as f:
+        ib_problem_df.to_csv(f, index=False)
 
 
 def generate_grade_df(grade_dict):
@@ -375,10 +440,12 @@ def collect_moodle_dfs(bucket, prefix):
     }
 
 
-def collect_quiz_dfs(bucket, key):
+def collect_content_dfs(bucket, key):
     key_questions = key + "/content/quiz_questions.csv"
     key_question_contents = key + "/content/quiz_question_contents.csv"
     key_multichoice_answers = key + "/content/quiz_multichoice_answers.csv"
+    key_ib_input_instances = key + "/content/ib_input_instances.csv"
+    key_ib_pset_problems = key + "/content/ib_pset_problems.csv"
 
     s3_client = boto3.client("s3")
     quiz_question_stream = s3_client.get_object(
@@ -390,6 +457,12 @@ def collect_quiz_dfs(bucket, key):
     quiz_multichoice_answers_stream = s3_client.get_object(
         Bucket=bucket,
         Key=key_multichoice_answers)
+    ib_input_instances_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_ib_input_instances)
+    ib_pset_problems_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_ib_pset_problems)
 
     quiz_question_data = pd.read_csv(
         BytesIO(quiz_question_stream["Body"].read())
@@ -400,16 +473,24 @@ def collect_quiz_dfs(bucket, key):
     quiz_multichoice_answers_data = pd.read_csv(
         BytesIO(quiz_multichoice_answers_stream["Body"].read()),
     )
-
+    ib_input_instances_data = pd.read_csv(
+        BytesIO(ib_input_instances_stream["Body"].read()),
+    )
+    ib_pset_problems_data = pd.read_csv(
+        BytesIO(ib_pset_problems_stream["Body"].read()),
+    )
     return {"quiz_questions": quiz_question_data,
             "quiz_question_contents": quiz_question_contents_data,
-            "quiz_multichoice_answers": quiz_multichoice_answers_data}
+            "quiz_multichoice_answers": quiz_multichoice_answers_data,
+            "ib_input_instances": ib_input_instances_data,
+            "ib_pset_problems": ib_pset_problems_data
+            }
 
 
 def compile_models(data_bucket, data_key):
     moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
-    quiz_data_dfs = collect_quiz_dfs(data_bucket, data_key)
-    all_raw_dfs = moodle_dfs | quiz_data_dfs
+    content_dfs = collect_content_dfs(data_bucket, data_key)
+    all_raw_dfs = moodle_dfs | content_dfs
     return all_raw_dfs
 
 

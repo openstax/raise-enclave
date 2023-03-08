@@ -4,6 +4,7 @@ from enclave_mgmt import compile_models
 import io
 import json
 import os
+import csv
 
 
 def test_compile_models(
@@ -19,7 +20,9 @@ def test_compile_models(
 
     (moodle_grades, moodle_users,
         quiz_questions, quiz_question_contents,
-        quiz_multichoice_answers) = local_file_collections
+        quiz_multichoice_answers,
+        ib_input_instances,
+        ib_pset_problems) = local_file_collections
 
     s3_client = boto3.client('s3')
     stubber_client = Stubber(s3_client)
@@ -88,6 +91,24 @@ def test_compile_models(
             }
         )
 
+    body = io.BytesIO(ib_input_instances.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/ib_input_instances.csv"
+            }
+        )
+
+    body = io.BytesIO(ib_pset_problems.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/ib_pset_problems.csv"
+            }
+        )
+
     stubber_client.activate()
     mocker.patch('boto3.client', lambda service: s3_client)
 
@@ -106,44 +127,56 @@ def test_compile_models(
      expected_courses,
      expected_quiz_questions,
      expected_quiz_question_contents,
-     expected_quiz_multichoice_answers) = local_expected_csvs
+     expected_quiz_multichoice_answers,
+     expected_ib_input_instances,
+     expected_ib_pset_problems) = local_expected_csvs
 
     with open(tmp_path / "assessments.csv", 'r') as f:
-        results = f.readlines()
+        results = list(csv.DictReader(f))
         for i in expected_assignments:
             assert i in results
 
     with open(tmp_path / "users.csv", 'r') as f:
-        results = f.readlines()
+        results = list(csv.DictReader(f))
         for i in expected_users:
             assert i in results
 
     with open(tmp_path / "enrollments.csv", 'r') as f:
-        results = f.readlines()
+        results = list(csv.DictReader(f))
         for i in expected_enrollments:
             assert i in results
 
     with open(tmp_path / "courses.csv", 'r') as f:
-        results = f.readlines()
+        results = list(csv.DictReader(f))
         for i in expected_courses:
             assert i in results
 
     with open(tmp_path / "grades.csv", 'r') as f:
-        results = f.readlines()
+        results = list(csv.DictReader(f))
         for i in expected_grades:
             assert i in results
 
     with open(tmp_path / "quiz_questions.csv", 'r') as f:
-        results = f.readlines()
+        results = list(csv.DictReader(f))
         for i in expected_quiz_questions:
             assert i in results
 
     with open(tmp_path / "quiz_question_contents.csv", 'r') as f:
-        results = f.readlines()
+        results = list(csv.DictReader(f))
         for i in expected_quiz_question_contents:
             assert i in results
 
     with open(tmp_path / "quiz_multichoice_answers.csv", 'r') as f:
-        results = f.readlines()
+        results = list(csv.DictReader(f))
         for i in expected_quiz_multichoice_answers:
+            assert i in results
+
+    with open(tmp_path / "ib_input_instances.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        for i in expected_ib_input_instances:
+            assert i in results
+
+    with open(tmp_path / "ib_pset_problems.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        for i in expected_ib_pset_problems:
             assert i in results
