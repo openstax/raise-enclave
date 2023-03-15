@@ -28,6 +28,7 @@ Enclave containers can access the following data CSV files:
 
 * [assessments.csv](#assessmentscsv)
 * [courses.csv](#coursescsv)
+* [course_contents.csv](#course_contentscsv)
 * [enrollments.csv](#enrollmentscsv)
 * [grades.csv](#gradescsv)
 * [ib_input_instances.csv](#ib_input_instancescsv)
@@ -53,6 +54,15 @@ Sample files that can be used as illustrative references can be found in this re
 | - | - | - |
 | id | int | Unique course ID |
 | name | str | User friendly course name |
+
+## `course_contents.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| section | str | Section name |
+| activity_name | str | Activity name |
+| lesson_page | str | Lesson page name |
+| content_id | str | Content ID |
 
 ## `enrollments.csv`
 
