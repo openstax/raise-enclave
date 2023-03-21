@@ -62,7 +62,7 @@ Sample files that can be used as illustrative references can be found in this re
 | section | str | Section name |
 | activity_name | str | Activity name |
 | lesson_page | str | Lesson page name |
-| content_id | str | Content ID |
+| content_id | UUID | Content page UUID |
 
 ## `enrollments.csv`
 
