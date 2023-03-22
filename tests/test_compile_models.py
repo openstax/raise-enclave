@@ -22,7 +22,8 @@ def test_compile_models(
         quiz_questions, quiz_question_contents,
         quiz_multichoice_answers,
         ib_input_instances,
-        ib_pset_problems) = local_file_collections
+        ib_pset_problems,
+        course_contents) = local_file_collections
 
     s3_client = boto3.client('s3')
     stubber_client = Stubber(s3_client)
@@ -109,6 +110,15 @@ def test_compile_models(
             }
         )
 
+    body = io.BytesIO(course_contents.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Key': f"{data_key}/content/course_contents.csv"
+            }
+        )
+
     stubber_client.activate()
     mocker.patch('boto3.client', lambda service: s3_client)
 
@@ -129,7 +139,8 @@ def test_compile_models(
      expected_quiz_question_contents,
      expected_quiz_multichoice_answers,
      expected_ib_input_instances,
-     expected_ib_pset_problems) = local_expected_csvs
+     expected_ib_pset_problems,
+     expected_course_contents) = local_expected_csvs
 
     with open(tmp_path / "assessments.csv", 'r') as f:
         results = list(csv.DictReader(f))
@@ -179,4 +190,9 @@ def test_compile_models(
     with open(tmp_path / "ib_pset_problems.csv", 'r') as f:
         results = list(csv.DictReader(f))
         for i in expected_ib_pset_problems:
+            assert i in results
+
+    with open(tmp_path / "course_contents.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        for i in expected_course_contents:
             assert i in results

@@ -20,6 +20,7 @@ MODEL_QUIZ_QUESTION_CONTENTS = "quiz_question_contents.csv"
 MODEL_MULTICHOICE_ANSWERS = "quiz_multichoice_answers.csv"
 MODEL_INPUT_INSTANCES = "ib_input_instances.csv"
 MODEL_PSET_PROBLEMS = "ib_pset_problems.csv"
+MODEL_COURSE_CONTENTS = "course_contents.csv"
 
 
 class Demographic(BaseModel):
@@ -146,6 +147,16 @@ class ProblemSetProblem(BaseModel):
     problem_type: Literal['input', 'dropdown', 'multiselect', 'multiplechoice']
     solution: str
     solution_options: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class CourseContents(BaseModel):
+    section: str
+    activity_name: str
+    lesson_page: str
+    content_id: UUID
 
     class Config:
         extra = Extra.forbid
@@ -290,6 +301,20 @@ def ib_problem_model(clean_raw_df):
     return ib_problem_df
 
 
+def course_contents_model(clean_raw_df):
+    course_contents_df = clean_raw_df['course_contents']
+    course_contents_df = course_contents_df[
+                  ['section',
+                   'activity_name',
+                   'lesson_page',
+                   'content_id']]
+
+    for item in course_contents_df.to_dict(orient='records'):
+        CourseContents.parse_obj(item)
+
+    return course_contents_df
+
+
 def scrub_raw_dfs(all_raw_dfs):
     moodle_users_df = all_raw_dfs['moodle_users']
 
@@ -317,6 +342,7 @@ def create_models(output_path, all_raw_dfs):
     quiz_multichoice_answers_df = multichoice_answer_model(clean_raw_df)
     ib_input_df = ib_input_model(clean_raw_df)
     ib_problem_df = ib_problem_model(clean_raw_df)
+    course_contents_df = course_contents_model(clean_raw_df)
 
     with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
         users_df.to_csv(f, index=False)
@@ -338,6 +364,8 @@ def create_models(output_path, all_raw_dfs):
         ib_input_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_PSET_PROBLEMS}", "w") as f:
         ib_problem_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_COURSE_CONTENTS}", "w") as f:
+        course_contents_df.to_csv(f, index=False)
 
 
 def generate_grade_df(grade_dict):
@@ -446,6 +474,7 @@ def collect_content_dfs(bucket, key):
     key_multichoice_answers = key + "/content/quiz_multichoice_answers.csv"
     key_ib_input_instances = key + "/content/ib_input_instances.csv"
     key_ib_pset_problems = key + "/content/ib_pset_problems.csv"
+    key_course_contents = key + "/content/course_contents.csv"
 
     s3_client = boto3.client("s3")
     quiz_question_stream = s3_client.get_object(
@@ -463,6 +492,9 @@ def collect_content_dfs(bucket, key):
     ib_pset_problems_stream = s3_client.get_object(
         Bucket=bucket,
         Key=key_ib_pset_problems)
+    course_contents_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_course_contents)
 
     quiz_question_data = pd.read_csv(
         BytesIO(quiz_question_stream["Body"].read())
@@ -479,11 +511,16 @@ def collect_content_dfs(bucket, key):
     ib_pset_problems_data = pd.read_csv(
         BytesIO(ib_pset_problems_stream["Body"].read()),
     )
+    course_contents_data = pd.read_csv(
+        BytesIO(course_contents_stream["Body"].read()),
+    )
+
     return {"quiz_questions": quiz_question_data,
             "quiz_question_contents": quiz_question_contents_data,
             "quiz_multichoice_answers": quiz_multichoice_answers_data,
             "ib_input_instances": ib_input_instances_data,
-            "ib_pset_problems": ib_pset_problems_data
+            "ib_pset_problems": ib_pset_problems_data,
+            "course_contents": course_contents_data
             }
 
 
