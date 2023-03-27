@@ -21,7 +21,8 @@ MODEL_MULTICHOICE_ANSWERS = "quiz_multichoice_answers.csv"
 MODEL_INPUT_INSTANCES = "ib_input_instances.csv"
 MODEL_PSET_PROBLEMS = "ib_pset_problems.csv"
 MODEL_COURSE_CONTENTS = "course_contents.csv"
-
+MODEL_QUIZ_ATTEMPTS = "quiz_attempts.csv"
+MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONESES = "quiz_attempt_multichoice_responses.csv"
 
 class Demographic(BaseModel):
     user_uuid: UUID
@@ -161,6 +162,27 @@ class CourseContents(BaseModel):
     class Config:
         extra = Extra.forbid
 
+class QuizAttempts(BaseModel):
+    id: int
+    assessment_id: int
+    user_uuid: UUID
+    course_id: int
+    attempt_number: int
+    grade_percentage: float
+    time_started: int
+    time_finished: int
+
+    class Config:
+        extra = Extra.forbid
+
+class QuizAttemptMultichoiceResponses(BaseModel):
+    attempt_id: int
+    question_number: int
+    question_id: UUID
+    answer_id: int
+
+    class Config:
+        extra = Extra.forbid
 
 def multichoice_answer_model(clean_raw_df):
     quiz_multichoice_answer_df = clean_raw_df['quiz_multichoice_answers']
@@ -315,6 +337,38 @@ def course_contents_model(clean_raw_df):
     return course_contents_df
 
 
+def quiz_attempts_model(clean_raw_df):
+    quiz_attempts_df = clean_raw_df['quiz_attempts']
+    quiz_attempts_df = quiz_attempts_df[
+                  ['id',
+                   'assessment_id',
+                   'user_uuid',
+                   'course_id',
+                   'attempt_number',
+                   'grade_percentage',
+                   'time_started',
+                   'time_finished']]
+
+    for item in quiz_attempts_df.to_dict(orient='records'):
+        QuizAttempts.parse_obj(item)
+
+    return quiz_attempts_df
+
+
+def quiz_attempt_multichoice_responses_model(clean_raw_df):
+    quiz_attempt_multichoice_responses_df = clean_raw_df['quiz_attempt_multichoice_responses']
+    quiz_attempt_multichoice_responses_df = quiz_attempt_multichoice_responses_df[
+                  ['attempt_id',
+                   'question_number',
+                   'question_id',
+                   'answer_id']]
+
+    for item in quiz_attempt_multichoice_responses_df.to_dict(orient='records'):
+        QuizAttemptMultichoiceResponses.parse_obj(item)
+
+    return quiz_attempt_multichoice_responses_df
+
+
 def scrub_raw_dfs(all_raw_dfs):
     moodle_users_df = all_raw_dfs['moodle_users']
 
@@ -343,6 +397,8 @@ def create_models(output_path, all_raw_dfs):
     ib_input_df = ib_input_model(clean_raw_df)
     ib_problem_df = ib_problem_model(clean_raw_df)
     course_contents_df = course_contents_model(clean_raw_df)
+    quiz_attempts_df = quiz_attempts_model(clean_raw_df)
+    quiz_attempt_multichoice_responses_df = quiz_attempt_multichoice_responses_model(clean_raw_df)
 
     with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
         users_df.to_csv(f, index=False)
@@ -366,6 +422,10 @@ def create_models(output_path, all_raw_dfs):
         ib_problem_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_COURSE_CONTENTS}", "w") as f:
         course_contents_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_QUIZ_ATTEMPTS}", "w") as f:
+        quiz_attempts_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONESES}", "w") as f:
+        quiz_attempt_multichoice_responses_df.to_csv(f, index=False)
 
 
 def generate_grade_df(grade_dict):
@@ -475,6 +535,8 @@ def collect_content_dfs(bucket, key):
     key_ib_input_instances = key + "/content/ib_input_instances.csv"
     key_ib_pset_problems = key + "/content/ib_pset_problems.csv"
     key_course_contents = key + "/content/course_contents.csv"
+    key_quiz_attempts = key + "/content/quiz_attempts.csv"
+    key_quiz_attempt_multichoice_responses = key + "/content/quiz_attempt_multichoice_responses.csv"
 
     s3_client = boto3.client("s3")
     quiz_question_stream = s3_client.get_object(
@@ -495,6 +557,12 @@ def collect_content_dfs(bucket, key):
     course_contents_stream = s3_client.get_object(
         Bucket=bucket,
         Key=key_course_contents)
+    quiz_attempts_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_quiz_attempts)
+    quiz_attempt_multichoice_responses_stream = s3_client.get_object(
+        Bucket=bucket,
+        Key=key_quiz_attempt_multichoice_responses)
 
     quiz_question_data = pd.read_csv(
         BytesIO(quiz_question_stream["Body"].read())
@@ -514,13 +582,21 @@ def collect_content_dfs(bucket, key):
     course_contents_data = pd.read_csv(
         BytesIO(course_contents_stream["Body"].read()),
     )
+    quiz_attempts_data = pd.read_csv(
+        BytesIO(quiz_attempts_stream["Body"].read()),
+    )
+    quiz_attempt_multichoice_responses_data = pd.read_csv(
+        BytesIO(quiz_attempt_multichoice_responses_stream["Body"].read()),
+    )
 
     return {"quiz_questions": quiz_question_data,
             "quiz_question_contents": quiz_question_contents_data,
             "quiz_multichoice_answers": quiz_multichoice_answers_data,
             "ib_input_instances": ib_input_instances_data,
             "ib_pset_problems": ib_pset_problems_data,
-            "course_contents": course_contents_data
+            "course_contents": course_contents_data,
+            "quiz_attempts": quiz_attempts_data,
+            "quiz_attempt_multichoice_responses": quiz_attempt_multichoice_responses_data
             }
 
 
