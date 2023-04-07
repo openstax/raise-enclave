@@ -292,5 +292,340 @@
       "useridnumber": ""
     }
   ],
-  "warnings": []
+  "warnings": [],
+  "quizzes": [
+    {
+      "id": 1,
+      "name": "Unit 1, Section A Quiz",
+      "sumgrades": 5,
+      "course": 2
+    },
+    {
+      "id": 2,
+      "name": "Unit 1, Section B Quiz",
+      "sumgrades": 5,
+      "course": 2
+    }
+  ],
+  "attempts": {
+    "9": {
+      "1": {
+        "summaries": [
+          {
+            "id": 1,
+            "quiz": 1,
+            "userid": 9,
+            "attempt": 1,
+            "timestart": 1650122648,
+            "timefinish": 1661272078,
+            "sumgrades": 0
+          }
+        ],
+        "details": {
+          "1": {
+            "attempt": {
+              "id": 1,
+              "quiz": 1,
+              "userid": 9,
+              "attempt": 1
+            },
+            "questions": [
+              {
+                "slot": 1,
+                "answer": [
+                  "<p>80</p>"
+                ]
+              },
+              {
+                "slot": 2,
+                "answer": [
+                  "<p>30</p>"
+                ]
+              },
+              {
+                "slot": 3,
+                "answer": [
+                  "<p>23</p>"
+                ]
+              },
+              {
+                "slot": 4,
+                "answer": []
+              },
+              {
+                "slot": 5,
+                "answer": []
+              }
+            ]
+          }
+        }
+      },
+      "2": {
+        "summaries": [
+          {
+            "id": 2,
+            "quiz": 2,
+            "userid": 9,
+            "attempt": 1,
+            "timestart": 1560012648,
+            "timefinish": 1561252186,
+            "sumgrades": 2
+          },
+          {
+            "id": 3,
+            "quiz": 2,
+            "userid": 9,
+            "attempt": 2,
+            "timestart": 1600112648,
+            "timefinish": 1661272186,
+            "sumgrades": 4
+          }
+        ],
+        "details": {
+          "2": {
+            "attempt": {
+              "id": 2,
+              "quiz": 2,
+              "userid": 9,
+              "attempt": 1
+            },
+            "questions": [
+              {
+                "slot": 1,
+                "answer": [
+                  "<p>2</p></div>"
+                ]
+              },
+              {
+                "slot": 2,
+                "answer": [
+                  "<p>9</p>"
+                ]
+              },
+              {
+                "slot": 3,
+                "answer": []
+              },
+              {
+                "slot": 4,
+                "answer": [
+                  "<p>9</p>",
+                  "<p>6</p>"
+                ]
+              },
+              {
+                "slot": 5,
+                "answer": [
+                  "<p>55</p>"
+                ]
+              }
+            ]
+          },
+          "3": {
+            "attempt": {
+              "id": 3,
+              "quiz": 2,
+              "userid": 9,
+              "attempt": 2
+            },
+            "questions": [
+              {
+                "slot": 1,
+                "answer": [
+                  "<p>0</p></div>"
+                ]
+              },
+              {
+                "slot": 2,
+                "answer": [
+                  "<p>6</p>"
+                ]
+              },
+              {
+                "slot": 3,
+                "answer": [
+                  "<p>8</p><"
+                ]
+              },
+              {
+                "slot": 4,
+                "answer": [
+                  "<p>9</p>"
+                ]
+              },
+              {
+                "slot": 5,
+                "answer": [
+                  "<p>55</p>"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "7": {
+      "1": {
+        "summaries": [
+          {
+            "id": 4,
+            "quiz": 1,
+            "userid": 7,
+            "attempt": 1,
+            "timestart": 1650122648,
+            "timefinish": 1661272078,
+            "sumgrades": 0
+          }
+        ],
+        "details": {
+          "4": {
+            "attempt": {
+              "id": 4,
+              "quiz": 1,
+              "userid": 7,
+              "attempt": 1
+            },
+            "questions": [
+              {
+                "slot": 1,
+                "answer": [
+                  "<p>80</p>"
+                ]
+              },
+              {
+                "slot": 2,
+                "answer": [
+                  "<p>30</p>"
+                ]
+              },
+              {
+                "slot": 3,
+                "answer": [
+                  "<p>23</p>"
+                ]
+              },
+              {
+                "slot": 4,
+                "answer": []
+              },
+              {
+                "slot": 5,
+                "answer": []
+              }
+            ]
+          }
+        }
+      },
+      "2": {
+        "summaries": [
+          {
+            "id": 5,
+            "quiz": 2,
+            "userid": 9,
+            "attempt": 1,
+            "timestart": 1560012648,
+            "timefinish": 1561252186,
+            "sumgrades": 2
+          }
+        ],
+        "details": {
+          "5": {
+            "attempt": {
+              "id": 5,
+              "quiz": 2,
+              "userid": 9,
+              "attempt": 1
+            },
+            "questions": [
+              {
+                "slot": 1,
+                "answer": [
+                  "<p>2</p></div>"
+                ]
+              },
+              {
+                "slot": 2,
+                "answer": [
+                  "<p>9</p>"
+                ]
+              },
+              {
+                "slot": 3,
+                "answer": []
+              },
+              {
+                "slot": 4,
+                "answer": [
+                  "<p>9</p>",
+                  "<p>6</p>"
+                ]
+              },
+              {
+                "slot": 5,
+                "answer": [
+                  "<p>55</p>"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "8": {
+      "2": {
+        "summaries": [
+          {
+            "id": 6,
+            "quiz": 2,
+            "userid": 8,
+            "attempt": 1,
+            "timestart": 1560012648,
+            "timefinish": 1561252186,
+            "sumgrades": 2
+          }
+        ],
+        "details": {
+          "6": {
+            "attempt": {
+              "id": 6,
+              "quiz": 2,
+              "userid": 8,
+              "attempt": 1
+            },
+            "questions": [
+              {
+                "slot": 1,
+                "answer": [
+                  "<p>2</p></div>"
+                ]
+              },
+              {
+                "slot": 2,
+                "answer": [
+                  "<p>9</p>"
+                ]
+              },
+              {
+                "slot": 3,
+                "answer": []
+              },
+              {
+                "slot": 4,
+                "answer": [
+                  "<p>9</p>",
+                  "<p>6</p>"
+                ]
+              },
+              {
+                "slot": 5,
+                "answer": [
+                  "<p>55</p>"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
 }

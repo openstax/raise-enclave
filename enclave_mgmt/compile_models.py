@@ -338,7 +338,12 @@ def course_contents_model(clean_raw_df):
 
 
 def quiz_attempts_model(clean_raw_df):
-    quiz_attempts_df = clean_raw_df['quiz_attempts']
+
+    quiz_data = clean_raw_df['quiz_data']
+    attempts_summary = clean_raw_df['attempts_summary']
+    attempt_multichoice_response = clean_raw_df['attempt_multichoice_response']
+    quiz_attempts_df = pd.merge(attempts_summary, quiz_data[['quiz_id', 'max_grade']], on= 'quiz_id')
+    quiz_attempts_df['grade_percentage'] = quiz_attempts_df['attempt_grade'] / quiz_attempts_df['max_grade']
     quiz_attempts_df = quiz_attempts_df[
                   ['id',
                    'assessment_id',
@@ -442,6 +447,58 @@ def generate_grade_df(grade_dict):
                 })
     return pd.DataFrame(grade_data)
 
+def generate_quiz_data_df(grade_dict):
+
+    quiz_data = []
+    for course_id in grade_dict.keys():
+        for quiz in grade_dict[course_id]['quizzes']:
+            quiz_data.append({
+                'quiz_id': quiz['id'],
+                'name': quiz['name'],
+                'max_grade': quiz['sumgrades'],
+                'course_id': quiz['course']
+            })
+    return pd.DataFrame(quiz_data)
+
+def generate_attempts_summary_df(grade_dict):
+
+    attempt_data = []
+    for course_id in grade_dict.keys():
+        for _, users in grade_dict[course_id]['attempts'].items():
+            for _, quiz in users.items():
+                for attempt_summary in quiz['summaries']:
+                    attempt_data.append({
+                        'course_id': course_id,
+                        'user_id': attempt_summary['userid'],
+                        'quiz_id': attempt_summary['quiz'],
+                        'attempt_id': attempt_summary['id'],
+                        'attempt_number': attempt_summary['attempt'],
+                        'time_started': attempt_summary['timestart'],
+                        'time_finished': attempt_summary['timefinish'],
+                        'attempt_grade': attempt_summary['sumgrades']
+                    })
+    return pd.DataFrame(attempt_data)
+
+def generate_attempt_multichoice_response_df(grade_dict):
+
+    attempt_multichoice_response_data = []
+    for course_id in grade_dict.keys():
+        for _, users in grade_dict[course_id]['attempts'].items():
+            for _, quiz in users.items():
+                for _, attempt_detail in quiz['details'].items():
+                    for question in attempt_detail['questions']:
+                        for answer in question['answer']:
+                            attempt_multichoice_response_data.append({
+                                'course_id': course_id,
+                                'user_id': attempt_detail['attempt']['userid'],
+                                'quiz_id': attempt_detail['attempt']['quiz'],
+                                'attempt_id': attempt_detail['attempt']['id'],
+                                'attempt_number': attempt_detail['attempt']['attempt'],
+                                'answer': answer,
+                                'questions_number': question['slot']
+                            })
+    return pd.DataFrame(attempt_multichoice_response_data)
+
 
 def generate_enrollment_df(users_dict):
     enrollment_data = []
@@ -524,7 +581,10 @@ def collect_moodle_dfs(bucket, prefix):
         'moodle_users': generate_users_df(users_dict),
         'courses': generate_courses_df(users_dict),
         'enrollments': generate_enrollment_df(users_dict),
-        'grades': generate_grade_df(grades_dict)
+        'grades': generate_grade_df(grades_dict),
+        'quiz_data': generate_quiz_data_df(grades_dict),
+        'attempts_summary': generate_attempts_summary_df(grades_dict),
+        'attempt_multichoice_response': generate_attempt_multichoice_response_df(grades_dict)
     }
 
 
