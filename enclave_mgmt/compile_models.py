@@ -10,20 +10,20 @@ import pandas as pd
 from io import BytesIO
 from pydantic import BaseModel, Extra, validator
 
-MODEL_FILE_USERS = 'users.csv'
-MODEL_FILE_COURSES = 'courses.csv'
-MODEL_FILE_ENROLLMENTS = 'enrollments.csv'
-MODEL_FILE_ASSESSMENTS = 'assessments.csv'
-MODEL_FILE_GRADES = 'grades.csv'
-MODEL_QUIZ_QUESTIONS = 'quiz_questions.csv'
-MODEL_QUIZ_QUESTION_CONTENTS = 'quiz_question_contents.csv'
-MODEL_MULTICHOICE_ANSWERS = 'quiz_multichoice_answers.csv'
-MODEL_INPUT_INSTANCES = 'ib_input_instances.csv'
-MODEL_PSET_PROBLEMS = 'ib_pset_problems.csv'
-MODEL_COURSE_CONTENTS = 'course_contents.csv'
-MODEL_QUIZ_ATTEMPTS = 'quiz_attempts.csv'
+MODEL_FILE_USERS = "users.csv"
+MODEL_FILE_COURSES = "courses.csv"
+MODEL_FILE_ENROLLMENTS = "enrollments.csv"
+MODEL_FILE_ASSESSMENTS = "assessments.csv"
+MODEL_FILE_GRADES = "grades.csv"
+MODEL_QUIZ_QUESTIONS = "quiz_questions.csv"
+MODEL_QUIZ_QUESTION_CONTENTS = "quiz_question_contents.csv"
+MODEL_MULTICHOICE_ANSWERS = "quiz_multichoice_answers.csv"
+MODEL_INPUT_INSTANCES = "ib_input_instances.csv"
+MODEL_PSET_PROBLEMS = "ib_pset_problems.csv"
+MODEL_COURSE_CONTENTS = "course_contents.csv"
+MODEL_QUIZ_ATTEMPTS = "quiz_attempts.csv"
 MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES = \
-     'quiz_attempt_multichoice_responses.csv'
+     "quiz_attempt_multichoice_responses.csv"
 
 
 class Demographic(BaseModel):
@@ -43,7 +43,7 @@ class Demographic(BaseModel):
 
     @validator('birth_date')
     def birthdate_format(cls, v):
-        datetime.strptime(v, '%Y-%m-%d')
+        datetime.strptime(v, "%Y-%m-%d")
         return v
 
 
@@ -279,7 +279,7 @@ def assessments_and_grades_model(clean_raw_df):
     def convert_percentage(x):
         if x == '-':
             return None
-        return float(x.strip('%'))
+        return float(x.strip("%"))
 
     grades_df['grade_percentage'] = grades_df['grade_percentage'].map(
         convert_percentage
@@ -683,9 +683,9 @@ def collect_content_dfs(bucket, key):
         Bucket=bucket,
         Key=key_course_contents)
 
-    quiz_question_data = pd.read_csv(BytesIO(
-                                     quiz_question_stream["Body"].read()))
-
+    quiz_question_data = pd.read_csv(
+        BytesIO(quiz_question_stream["Body"].read())
+    )
     quiz_question_contents_data = pd.read_csv(
         BytesIO(quiz_question_contents_stream["Body"].read())
     )
@@ -707,7 +707,7 @@ def collect_content_dfs(bucket, key):
             "quiz_multichoice_answers": quiz_multichoice_answers_data,
             "ib_input_instances": ib_input_instances_data,
             "ib_pset_problems": ib_pset_problems_data,
-            "course_contents": course_contents_data,
+            "course_contents": course_contents_data
             }
 
 

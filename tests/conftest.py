@@ -37,7 +37,7 @@ def local_file_collections(test_data_path):
         quiz_multichoice_answers,
         ib_input_instances,
         ib_pset_problems,
-        course_contents,
+        course_contents
     )
 
 
