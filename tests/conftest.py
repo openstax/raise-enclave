@@ -28,10 +28,6 @@ def local_file_collections(test_data_path):
         ib_pset_problems = f.read()
     with open(test_data_path / "course_contents.csv", 'r') as f:
         course_contents = f.read()
-    with open(test_data_path / "quiz_attempts.csv", 'r') as f:
-        quiz_attempts = f.read()
-    with open(test_data_path / "quiz_attempt_multichoice_responses.csv", 'r') as f:
-        quiz_attempt_multichoice_responses = f.read()
 
     return (
         moodle_grades,
@@ -42,8 +38,6 @@ def local_file_collections(test_data_path):
         ib_input_instances,
         ib_pset_problems,
         course_contents,
-        quiz_attempts,
-        quiz_attempt_multichoice_responses
     )
 
 
@@ -77,7 +71,8 @@ def local_expected_csvs(test_data_path):
         course_contents = list(csv.DictReader(f))
     with open(test_data_path / "expected/quiz_attempts.csv", 'r') as f:
         quiz_attempts = list(csv.DictReader(f))
-    with open(test_data_path / "expected/quiz_attempt_multichoice_responses.csv", 'r') as f:
+    with open(test_data_path /
+              "expected/quiz_attempt_multichoice_responses.csv", 'r') as f:
         quiz_attempt_multichoice_responses = list(csv.DictReader(f))
     return (
         assessments,

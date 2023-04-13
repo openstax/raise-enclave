@@ -23,9 +23,7 @@ def test_compile_models(
         quiz_multichoice_answers,
         ib_input_instances,
         ib_pset_problems,
-        course_contents,
-        quiz_attempts,
-        quiz_attempt_multichoice_responses) = local_file_collections
+        course_contents) = local_file_collections
 
     s3_client = boto3.client('s3')
     stubber_client = Stubber(s3_client)
@@ -118,24 +116,6 @@ def test_compile_models(
         expected_params={
             'Bucket': data_bucket_name,
             'Key': f"{data_key}/content/course_contents.csv"
-            }
-        )
-
-    body = io.BytesIO(quiz_attempts.encode('utf-8'))
-    stubber_client.add_response(
-        'get_object', {"Body": body},
-        expected_params={
-            'Bucket': data_bucket_name,
-            'Key': f"{data_key}/content/quiz_attempts.csv"
-            }
-        )
-
-    body = io.BytesIO(quiz_attempt_multichoice_responses.encode('utf-8'))
-    stubber_client.add_response(
-        'get_object', {"Body": body},
-        expected_params={
-            'Bucket': data_bucket_name,
-            'Key': f"{data_key}/content/quiz_attempt_multichoice_responses.csv"
             }
         )
 
