@@ -33,6 +33,8 @@ Enclave containers can access the following data CSV files:
 * [grades.csv](#gradescsv)
 * [ib_input_instances.csv](#ib_input_instancescsv)
 * [ib_pset_problems.csv](#ib_pset_problemscsv)
+* [quiz_attempts.csv](#quiz_attemptscsv)
+* [quiz_attempt_multichoice_responses.csv](#quiz_attempt_multichoice_responsescsv)
 * [quiz_questions.csv](#quiz_questionscsv)
 * [quiz_question_contents.csv](#quiz_question_contentscsv)
 * [quiz_multichoice_answers.csv](#quiz_multichoice_answerscsv)
@@ -104,6 +106,34 @@ Sample files that can be used as illustrative references can be found in this re
 | problem_type | str | Problem type (one of 'input', 'dropdown', 'multiselect', or 'multiplechoice')|
 | solution | str | Solution string for problem |
 | solution_options | str | Solution options for problem |
+
+## `quiz_attempts.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | int | A unique quiz attempt ID |
+| assessment_id | int |  Assessment ID that can be joined against assessments.csv |
+| user_uuid | UUID | User UUID that can be joined against users.csv |
+| course_id | int | Course ID that can be joined against courses.csv|
+| attempt_number | int | The attempt number for the user in this course assessment |
+| grade_percentage | float | A value between 0 and 100 that reflects the attempt grade|
+| time_started | int | A Unix timestamp value that reflects when the attempt was started (seconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| time_finished | int | A Unix timestamp value that reflects when the attempt was finished (seconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+
+## `quiz_attempt_multichoice_responses.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| attempt_id | int | Attempt ID that can be joined against quiz_attempts.csv |
+| question_number | int |  The relative order number of the question in the quiz |
+| question_id | UUID | Question ID that can be joined against quiz_question_contents.csv |
+| answer_id | int | Question choice ID that can be joined against quiz_multichoice_answers.csv |
+
+Key notes:
+* There may be 0 or more matches for a given `attempt_id` and `question_number` in this table
+* A row for a given `attempt_id` and `question_number` will not be present if a student does not answer the question
+* At least one row will be present for a given `attempt_id` and `question_number` if a student answers the question
+* More than one row will be present for a given `attempt_id` and `question_number` if a student selects multiple choices where the question is configured as multi-select
 
 ## `quiz_questions.csv`
 

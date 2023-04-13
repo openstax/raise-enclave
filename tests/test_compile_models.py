@@ -140,7 +140,9 @@ def test_compile_models(
      expected_quiz_multichoice_answers,
      expected_ib_input_instances,
      expected_ib_pset_problems,
-     expected_course_contents) = local_expected_csvs
+     expected_course_contents,
+     expected_quiz_attempts,
+     expected_quiz_attempt_multichoice_responses) = local_expected_csvs
 
     with open(tmp_path / "assessments.csv", 'r') as f:
         results = list(csv.DictReader(f))
@@ -195,4 +197,14 @@ def test_compile_models(
     with open(tmp_path / "course_contents.csv", 'r') as f:
         results = list(csv.DictReader(f))
         for i in expected_course_contents:
+            assert i in results
+
+    with open(tmp_path / "quiz_attempts.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        for i in expected_quiz_attempts:
+            assert i in results
+
+    with open(tmp_path / "quiz_attempt_multichoice_responses.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        for i in expected_quiz_attempt_multichoice_responses:
             assert i in results
