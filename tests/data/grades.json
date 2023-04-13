@@ -472,8 +472,8 @@
             "quiz": 1,
             "userid": 7,
             "attempt": 1,
-            "timestart": 1650122648,
-            "timefinish": 1661272078,
+            "timestart": 1661273542,
+            "timefinish": 1661273642,
             "sumgrades": 0
           }
         ],
@@ -523,9 +523,9 @@
             "quiz": 2,
             "userid": 7,
             "attempt": 1,
-            "timestart": 1560012648,
-            "timefinish": 1561252186,
-            "sumgrades": 2
+            "timestart": 1661273564,
+            "timefinish": 1661273664,
+            "sumgrades": 3
           }
         ],
         "details": {
@@ -579,9 +579,9 @@
             "quiz": 2,
             "userid": 8,
             "attempt": 1,
-            "timestart": 1560012648,
-            "timefinish": 1561252186,
-            "sumgrades": 2
+            "timestart": 1661273250,
+            "timefinish": 1661273350,
+            "sumgrades": 1
           }
         ],
         "details": {
