@@ -129,6 +129,12 @@ Sample files that can be used as illustrative references can be found in this re
 | question_id | UUID | Question ID that can be joined against quiz_question_contents.csv |
 | answer_id | int | Question choice ID that can be joined against quiz_multichoice_answers.csv |
 
+Key notes:
+* There may be 0 or more matches for a given `attempt_id` and `question_number` in this table
+* A row for a given `attempt_id` and `question_number` will not be present if a student does not answer the question
+* At least one row will be present for a given `attempt_id` and `question_number` if a student answers the question
+* More than one row will be present for a given `attempt_id` and `question_number` if a student selects multiple choices where the question is configured as multi-select
+
 ## `quiz_questions.csv`
 
 | Column | Type | Notes |
