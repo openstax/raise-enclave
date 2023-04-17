@@ -16,6 +16,9 @@ phases:
   build:
     commands:
       - docker build . -t $IMAGE_NAME:$IMAGE_TAG
+    on-failure: ABORT
+    finally:
+      - "if [[ $CODEBUILD_BUILD_SUCCEEDING != 1 ]]; then curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"Error in raise-enclave pipeline!\"}' $SLACK_WEBHOOKURL; fi"
   post_build:
     commands:
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
