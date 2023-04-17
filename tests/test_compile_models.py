@@ -32,6 +32,12 @@ def test_compile_models(
     data_key = "data_files"
     grade_list = {"Contents": [{"Key": "2"}]}
     user_list = {"Contents": [{"Key": "2"}]}
+
+    grades_data = json.dumps(moodle_grades).encode('utf-8')
+    grades_data_obj = {"Body": io.BytesIO(grades_data)}
+    users_data = json.dumps(moodle_users).encode('utf-8')
+    users_data_obj = {"Body": io.BytesIO(users_data)}
+
     stubber_client.add_response(
         "list_objects", grade_list,
         expected_params={
@@ -39,22 +45,17 @@ def test_compile_models(
             'Prefix': f"{data_key}/moodle/grades"
         })
     stubber_client.add_response(
-        "list_objects", user_list,
-        expected_params={
-            'Bucket': data_bucket_name,
-            'Prefix': f"{data_key}/moodle/users"
-        }
-    )
-
-    grades_data = json.dumps(moodle_grades).encode('utf-8')
-    grades_data_obj = {"Body": io.BytesIO(grades_data)}
-    users_data = json.dumps(moodle_users).encode('utf-8')
-    users_data_obj = {"Body": io.BytesIO(users_data)}
-    stubber_client.add_response(
         'get_object', grades_data_obj,
         expected_params={
             'Bucket': data_bucket_name,
             'Key': '2'
+        }
+    )
+    stubber_client.add_response(
+        "list_objects", user_list,
+        expected_params={
+            'Bucket': data_bucket_name,
+            'Prefix': f"{data_key}/moodle/users"
         }
     )
     stubber_client.add_response(

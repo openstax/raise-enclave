@@ -612,34 +612,37 @@ def generate_users_df(users_dict):
 def collect_moodle_dfs(bucket, prefix):
     grades_dict, users_dict = {}, {}
     s3_client = boto3.client("s3")
-    # Note that these will only get 1000 classes at a time
-    grade_data_objects = s3_client.list_objects(
+    paginator = s3_client.get_paginator('list_objects')
+
+    grade_data_iterator = paginator.paginate(
         Bucket=bucket,
         Prefix=f"{prefix}/moodle/grades"
     )
-    users_data_objects = s3_client.list_objects(
+    users_data_iterator = paginator.paginate(
         Bucket=bucket,
         Prefix=f"{prefix}/moodle/users"
     )
-    for data_object in grade_data_objects.get("Contents"):
-        object_key = data_object.get("Key")
-        course_id = object_key.split("/")[-1].split(".json")[0]
-        data = s3_client.get_object(
-            Bucket=bucket,
-            Key=object_key
-        )
-        contents = data["Body"].read()
-        grades_dict[int(course_id)] = json.loads(contents)
+    for page in grade_data_iterator:
+        for data_object in page.get("Contents"):
+            object_key = data_object.get("Key")
+            course_id = object_key.split("/")[-1].split(".json")[0]
+            data = s3_client.get_object(
+                Bucket=bucket,
+                Key=object_key
+            )
+            contents = data["Body"].read()
+            grades_dict[int(course_id)] = json.loads(contents)
 
-    for data_object in users_data_objects.get("Contents"):
-        object_key = data_object.get("Key")
-        course_id = object_key.split("/")[-1].split(".json")[0]
-        data = s3_client.get_object(
-            Bucket=bucket,
-            Key=object_key
-        )
-        contents = data["Body"].read()
-        users_dict[int(course_id)] = json.loads(contents)
+    for page in users_data_iterator:
+        for data_object in page.get("Contents"):
+            object_key = data_object.get("Key")
+            course_id = object_key.split("/")[-1].split(".json")[0]
+            data = s3_client.get_object(
+                Bucket=bucket,
+                Key=object_key
+            )
+            contents = data["Body"].read()
+            users_dict[int(course_id)] = json.loads(contents)
 
     return {
         'moodle_users': generate_users_df(users_dict),
