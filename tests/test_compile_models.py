@@ -143,7 +143,11 @@ def test_compile_models(
      expected_ib_pset_problems,
      expected_course_contents,
      expected_quiz_attempts,
-     expected_quiz_attempt_multichoice_responses) = local_expected_csvs
+     expected_quiz_attempt_multichoice_responses,
+     expected_ib_content_loads,
+     expected_ib_problem_attempts,
+     expected_ib_input_submissions
+     ) = local_expected_csvs
 
     with open(tmp_path / "assessments.csv", 'r') as f:
         results = list(csv.DictReader(f))
@@ -209,3 +213,19 @@ def test_compile_models(
         results = list(csv.DictReader(f))
         for i in expected_quiz_attempt_multichoice_responses:
             assert i in results
+
+    with open(tmp_path / "ib_content_loads.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        for i in expected_ib_content_loads:
+            assert i in results
+
+    with open(tmp_path / "ib_problem_attempts.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        for i in expected_ib_problem_attempts:
+            assert i in results
+
+    with open(tmp_path / "expected_ib_input_submissions.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        for i in expected_ib_input_submissions:
+            assert i in results
+# create mocks for input json and output csvs.

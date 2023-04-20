@@ -39,7 +39,7 @@ def local_file_collections(test_data_path):
         ib_pset_problems,
         course_contents
     )
-
+# import json files. 
 
 @pytest.fixture
 def local_expected_csvs(test_data_path):
@@ -74,6 +74,12 @@ def local_expected_csvs(test_data_path):
     with open(test_data_path /
               "expected/quiz_attempt_multichoice_responses.csv", 'r') as f:
         quiz_attempt_multichoice_responses = list(csv.DictReader(f))
+    with open(test_data_path / "expected/ib_content_loads.csv", 'r') as f:
+        ib_content_loads = list(csv.DictReader(f))
+    with open(test_data_path / "expected/ib_problem_attempts.csv", 'r') as f:
+        ib_problem_attempts = list(csv.DictReader(f))
+    with open(test_data_path / "expected/ib_input_submissions.csv", 'r') as f:
+        ib_input_submissions = list(csv.DictReader(f))
     return (
         assessments,
         users,
@@ -87,7 +93,10 @@ def local_expected_csvs(test_data_path):
         ib_pset_problems,
         course_contents,
         quiz_attempts,
-        quiz_attempt_multichoice_responses
+        quiz_attempt_multichoice_responses,
+        ib_content_loads,
+        ib_problem_attempts,
+        ib_input_submissions
     )
 
 

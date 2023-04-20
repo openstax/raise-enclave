@@ -9,6 +9,7 @@ import argparse
 import pandas as pd
 from io import BytesIO
 from pydantic import BaseModel, Extra, validator
+from typing import List, Union
 
 MODEL_FILE_USERS = "users.csv"
 MODEL_FILE_COURSES = "courses.csv"
@@ -24,6 +25,9 @@ MODEL_COURSE_CONTENTS = "course_contents.csv"
 MODEL_QUIZ_ATTEMPTS = "quiz_attempts.csv"
 MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES = \
      "quiz_attempt_multichoice_responses.csv"
+MODEL_IB_CONTENT_LOADS = "ib_content_loads.csv"
+MODEL_IB_PROBLEM_ATTEMPTS = "ib_problem_attempts.csv"
+MODEL_IB_INPUT_SUBMISSIONS = "ib_input_submissions.csv"
 
 
 class Demographic(BaseModel):
@@ -184,6 +188,58 @@ class QuizAttemptMultichoiceResponses(BaseModel):
     question_number: int
     question_id: UUID
     answer_id: int
+
+    class Config:
+        extra = Extra.forbid
+
+
+class IBContentLoads(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    variant: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class IBProblemAttempts(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    pset_content_id: UUID
+    pset_problem_content_id: UUID
+    variant: str
+    problem_type: str
+    response: Union[str, List[str]]
+    correct: bool
+    attempt: int
+    final_attempt: bool
+
+    class Config:
+        extra = Extra.forbid
+
+    @validator('response')
+    def birthdate_format(cls, value, values):
+        if values['problem_type'] == 'multichoice' and check if value is type str
+            return ValueError()
+        if values['problem_type'] != 'multichoice' and check if value is not type str
+            return ValueError()        
+        
+        return value
+class IBInputSubmissions(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    input_content_id: UUID
+    variant: str
+    response: str
 
     class Config:
         extra = Extra.forbid
@@ -714,10 +770,46 @@ def collect_content_dfs(bucket, key):
             }
 
 
-def compile_models(data_bucket, data_key):
+def collect_event_data_dfs(events_bucket, events_key):
+
+    key_ib_content_loads = events_key + "/ib_content_loads.json"
+    key_ib_problem_attempts = events_key + "/ib_problem_attempts.json"
+    key_ib_input_submissions = events_key + "/ib_input_submissions.json"
+
+    s3_client = boto3.client("s3")
+
+    ib_content_loads_stream = s3_client.get_object(
+        Bucket=events_bucket,
+        Key=key_ib_content_loads)
+    ib_problem_attempts_stream = s3_client.get_object(
+        Bucket=events_bucket,
+        Key=key_ib_problem_attempts)
+    ib_input_submissions_stream = s3_client.get_object(
+        Bucket=events_bucket,
+        Key=key_ib_input_submissions)
+# convert to dataframes. Use json key called data -> will return array of every event.
+    ib_content_loads_data = json.loads(
+        BytesIO(ib_content_loads_stream["Body"].read())
+    )
+    ib_problem_attempts_data = json.loads(
+        BytesIO(ib_problem_attempts_stream["Body"].read())
+    )
+    ib_input_submissions_data = json.loads(
+        BytesIO(ib_input_submissions_stream["Body"].read())
+    )
+
+    return {
+        "ib_content_loads": ib_content_loads_data,
+        "ib_problem_attempts": ib_problem_attempts_data,
+        "ib_input_submissions": ib_input_submissions_data
+    }
+
+
+def compile_models(data_bucket, data_key, events_bucket, events_key):
     moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
     content_dfs = collect_content_dfs(data_bucket, data_key)
-    all_raw_dfs = moodle_dfs | content_dfs
+    event_data = collect_event_data_dfs(events_bucket, events_key)
+    all_raw_dfs = moodle_dfs | content_dfs | event_data
     return all_raw_dfs
 
 
@@ -727,13 +819,22 @@ def main():
                         help='bucket for the moodle grade and user data dirs')
     parser.add_argument('data_prefix', type=str,
                         help='prefix for the moodle grade and user data dirs')
+# cahnge comments 
+    parser.add_argument('events_bucket', type=str,
+                        help='bucket for the moodle grade and user data dirs')
+    parser.add_argument('events_prefix', type=str,
+                        help='prefix for the moodle grade and user data dirs')
+
     args = parser.parse_args()
 
     output_path = os.environ["CSV_OUTPUT_DIR"]
 
     all_raw_dfs = compile_models(
         args.data_bucket,
-        args.data_prefix)
+        args.data_prefix,
+        args.events_bucket,
+        args.events_prefix
+        )
 
     create_models(output_path, all_raw_dfs)
 
