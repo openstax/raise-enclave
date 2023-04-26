@@ -24,7 +24,7 @@ def test_compile_models(
         ib_input_instances,
         ib_pset_problems,
         course_contents,
-        ib_content_loads,
+        content_loads,
         ib_problem_attempts,
         ib_input_submissions
      ) = local_file_collections
@@ -127,12 +127,12 @@ def test_compile_models(
             }
         )
 
-    body = io.BytesIO(ib_content_loads.encode('utf-8'))
+    body = io.BytesIO(content_loads.encode('utf-8'))
     stubber_client.add_response(
         'get_object', {"Body": body},
         expected_params={
             'Bucket': event_data_bucket_name,
-            'Key': f"{event_data_key}/ib_content_loads.json"
+            'Key': f"{event_data_key}/content_loaded_v1.json"
             }
         )
 
@@ -141,7 +141,7 @@ def test_compile_models(
         'get_object', {"Body": body},
         expected_params={
             'Bucket': event_data_bucket_name,
-            'Key': f"{event_data_key}/ib_problem_attempts.json"
+            'Key': f"{event_data_key}/ib_pset_problem_attempted_v1.json"
             }
         )
 
@@ -150,7 +150,7 @@ def test_compile_models(
         'get_object', {"Body": body},
         expected_params={
             'Bucket': event_data_bucket_name,
-            'Key': f"{event_data_key}/ib_input_submissions.json"
+            'Key': f"{event_data_key}/ib_input_submitted_v1.json"
             }
         )
 
@@ -179,7 +179,7 @@ def test_compile_models(
      expected_course_contents,
      expected_quiz_attempts,
      expected_quiz_attempt_multichoice_responses,
-     expected_ib_content_loads,
+     expected_content_loads,
      expected_ib_problem_attempts,
      expected_ib_input_submissions
      ) = local_expected_csvs
@@ -249,17 +249,22 @@ def test_compile_models(
         for i in expected_quiz_attempt_multichoice_responses:
             assert i in results
 
-    with open(tmp_path / "ib_content_loads.csv", 'r') as f:
+    with open(tmp_path / "content_loads.csv", 'r') as f:
         results = list(csv.DictReader(f))
-        for i in expected_ib_content_loads:
+        assert len(results) == len(expected_content_loads)
+
+        for i in expected_content_loads:
             assert i in results
 
     with open(tmp_path / "ib_problem_attempts.csv", 'r') as f:
         results = list(csv.DictReader(f))
+        assert len(results) == len(expected_ib_problem_attempts)
+
         for i in expected_ib_problem_attempts:
             assert i in results
 
     with open(tmp_path / "ib_input_submissions.csv", 'r') as f:
         results = list(csv.DictReader(f))
+        assert len(results) == len(expected_ib_input_submissions)
         for i in expected_ib_input_submissions:
             assert i in results

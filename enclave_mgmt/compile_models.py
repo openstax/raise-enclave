@@ -25,7 +25,7 @@ MODEL_COURSE_CONTENTS = "course_contents.csv"
 MODEL_QUIZ_ATTEMPTS = "quiz_attempts.csv"
 MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES = \
      "quiz_attempt_multichoice_responses.csv"
-MODEL_IB_CONTENT_LOADS = "ib_content_loads.csv"
+MODEL_CONTENT_LOADS = "content_loads.csv"
 MODEL_IB_PROBLEM_ATTEMPTS = "ib_problem_attempts.csv"
 MODEL_IB_INPUT_SUBMISSIONS = "ib_input_submissions.csv"
 
@@ -193,7 +193,7 @@ class QuizAttemptMultichoiceResponses(BaseModel):
         extra = Extra.forbid
 
 
-class IBContentLoads(BaseModel):
+class ContentLoads(BaseModel):
     user_uuid: UUID
     course_id: int
     impression_id: UUID
@@ -399,9 +399,20 @@ def course_contents_model(clean_raw_df):
     return course_contents_df
 
 
-def ib_content_loads_model(clean_raw_df):
-    ib_content_loads_df = clean_raw_df['ib_content_loads']
-    ib_content_loads_df = ib_content_loads_df[
+def filter_events(event_df, clean_raw_df):
+    enrollments_df = clean_raw_df['enrollments']
+    users_df = clean_raw_df['moodle_users'][['user_id', 'uuid']]
+    enrollments_df = pd.merge(enrollments_df, users_df, on='user_id')
+    enrollments_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
+    filter_df = enrollments_df[['user_uuid', 'course_id']]
+    event_df = pd.merge(event_df, filter_df,
+                        on=['user_uuid', 'course_id'])
+    return event_df
+
+
+def content_loads_model(clean_raw_df):
+    content_loads_df = clean_raw_df['content_loads']
+    content_loads_df = content_loads_df[
                     ['user_uuid',
                      'course_id',
                      'impression_id',
@@ -409,10 +420,12 @@ def ib_content_loads_model(clean_raw_df):
                      'content_id',
                      'variant']]
 
-    for item in ib_content_loads_df.to_dict(orient='records'):
-        IBContentLoads.parse_obj(item)
+    content_loads_df = filter_events(content_loads_df, clean_raw_df)
 
-    return ib_content_loads_df
+    for item in content_loads_df.to_dict(orient='records'):
+        ContentLoads.parse_obj(item)
+
+    return content_loads_df
 
 
 def ib_input_submissions_models(clean_raw_df):
@@ -426,6 +439,9 @@ def ib_input_submissions_models(clean_raw_df):
                      'input_content_id',
                      'variant',
                      'response']]
+
+    ib_input_submissions_df = filter_events(ib_input_submissions_df,
+                                            clean_raw_df)
 
     for item in ib_input_submissions_df.to_dict(orient='records'):
         IBInputSubmissions.parse_obj(item)
@@ -449,6 +465,9 @@ def ib_problem_attempts_models(clean_raw_df):
                      'correct',
                      'attempt',
                      'final_attempt']]
+
+    ib_problem_attempts_df = filter_events(ib_problem_attempts_df,
+                                           clean_raw_df)
 
     for item in ib_problem_attempts_df.to_dict(orient='records'):
         IBProblemAttempts.parse_obj(item)
@@ -565,7 +584,7 @@ def create_models(output_path, all_raw_dfs):
     ib_input_df = ib_input_model(clean_raw_df)
     ib_problem_df = ib_problem_model(clean_raw_df)
     course_contents_df = course_contents_model(clean_raw_df)
-    ib_content_loads_df = ib_content_loads_model(clean_raw_df)
+    content_loads_df = content_loads_model(clean_raw_df)
     ib_problem_attempts_df = ib_problem_attempts_models(clean_raw_df)
     ib_input_submissions_df = ib_input_submissions_models(clean_raw_df)
 
@@ -604,8 +623,8 @@ def create_models(output_path, all_raw_dfs):
         f"{output_path}/{MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES}", "w")\
             as f:
         quiz_attempt_multichoice_responses_df.to_csv(f, index=False)
-    with open(f"{output_path}/{MODEL_IB_CONTENT_LOADS}", "w") as f:
-        ib_content_loads_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_CONTENT_LOADS}", "w") as f:
+        content_loads_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_IB_PROBLEM_ATTEMPTS}", "w") as f:
         ib_problem_attempts_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_IB_INPUT_SUBMISSIONS}", "w") as f:
@@ -840,15 +859,15 @@ def collect_content_dfs(bucket, key):
 
 def collect_event_data_dfs(events_bucket, events_key):
 
-    key_ib_content_loads = events_key + "/ib_content_loads.json"
-    key_ib_problem_attempts = events_key + "/ib_problem_attempts.json"
-    key_ib_input_submissions = events_key + "/ib_input_submissions.json"
+    key_content_loads = events_key + "/content_loaded_v1.json"
+    key_ib_problem_attempts = events_key + "/ib_pset_problem_attempted_v1.json"
+    key_ib_input_submissions = events_key + "/ib_input_submitted_v1.json"
 
     s3_client = boto3.client("s3")
 
-    ib_content_loads_stream = s3_client.get_object(
+    content_loads_stream = s3_client.get_object(
         Bucket=events_bucket,
-        Key=key_ib_content_loads)
+        Key=key_content_loads)
     ib_problem_attempts_stream = s3_client.get_object(
         Bucket=events_bucket,
         Key=key_ib_problem_attempts)
@@ -856,18 +875,18 @@ def collect_event_data_dfs(events_bucket, events_key):
         Bucket=events_bucket,
         Key=key_ib_input_submissions)
 
-    ib_content_loads_data = pd.read_json(
-        BytesIO(ib_content_loads_stream["Body"].read())
+    content_loads_data = pd.DataFrame(
+        json.loads(content_loads_stream["Body"].read())['data']
     )
-    ib_problem_attempts_data = pd.read_json(
-        BytesIO(ib_problem_attempts_stream["Body"].read())
+    ib_problem_attempts_data = pd.DataFrame(
+        json.loads(ib_problem_attempts_stream["Body"].read())['data']
     )
-    ib_input_submissions_data = pd.read_json(
-        BytesIO(ib_input_submissions_stream["Body"].read())
+    ib_input_submissions_data = pd.DataFrame(
+        json.loads(ib_input_submissions_stream["Body"].read())['data']
     )
 
     return {
-        "ib_content_loads": ib_content_loads_data,
+        "content_loads": content_loads_data,
         "ib_problem_attempts": ib_problem_attempts_data,
         "ib_input_submissions": ib_input_submissions_data
     }

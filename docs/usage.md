@@ -31,7 +31,7 @@ Enclave containers can access the following data CSV files:
 * [course_contents.csv](#course_contentscsv)
 * [enrollments.csv](#enrollmentscsv)
 * [grades.csv](#gradescsv)
-* [ib_content_loads.csv](#ib_content_loadscsv)
+* [content_loads.csv](#content_loadscsv)
 * [ib_input_instances.csv](#ib_input_instancescsv)
 * [ib_input_submissions.csv](#ib_input_submissionscsv)
 * [ib_problem_attempts.csv](#ib_problem_attemptscsv)
@@ -87,7 +87,7 @@ Sample files that can be used as illustrative references can be found in this re
 | grade_percentage | float | A value between 0 and 100 that reflects in the course gradebook |
 | time_submitted | int | A Unix timestamp value that reflects when the grade was created (seconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
 
-## `ib_content_loads.csv`
+## `content_loads.csv`
 
 | Column | Type | Notes |
 | - | - | - |
