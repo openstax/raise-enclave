@@ -224,7 +224,7 @@ class IBProblemAttempts(BaseModel):
         extra = Extra.forbid
 
     @validator('response')
-    def birthdate_format(cls, value, values):
+    def response_type(cls, value, values):
         if values['problem_type'] == 'multiselect' and type(value) == str:
             raise ValueError('Response must be a list')
         if values['problem_type'] != 'multiselect' and type(value) != str:

@@ -98,7 +98,6 @@ Sample files that can be used as illustrative references can be found in this re
 | content_id | UUID | Content ID that can be joined against `course_contents.csv` |
 | variant | str | Variant name |
 
-
 ## `ib_input_instances.csv`
 
 | Column | Type | Notes |
@@ -139,7 +138,6 @@ Sample files that can be used as illustrative references can be found in this re
 | correct | bool | Whether the response was correct |
 | attempt | int | Attempt count for the problem |
 | final_attempt | bool | Whether the attempt was the final allowed attempt for the problem |
-
 
 ## `ib_pset_problems.csv`
 
