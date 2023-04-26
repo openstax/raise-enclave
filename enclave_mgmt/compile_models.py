@@ -225,12 +225,13 @@ class IBProblemAttempts(BaseModel):
 
     @validator('response')
     def birthdate_format(cls, value, values):
-        if values['problem_type'] == 'multichoice' and check if value is type str
+        if values['problem_type'] == 'multichoice' and type(value) == str:
             return ValueError()
-        if values['problem_type'] != 'multichoice' and check if value is not type str
-            return ValueError()        
-        
+        if values['problem_type'] != 'multichoice' and type(value) != str:
+            return ValueError()
         return value
+
+
 class IBInputSubmissions(BaseModel):
     user_uuid: UUID
     course_id: int
@@ -398,6 +399,63 @@ def course_contents_model(clean_raw_df):
     return course_contents_df
 
 
+def ib_content_loads_model(clean_raw_df):
+    ib_content_loads_df = clean_raw_df['ib_content_loads']
+    ib_content_loads_df = ib_content_loads_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'variant']]
+
+    for item in ib_content_loads_df.to_dict(orient='records'):
+        IBContentLoads.parse_obj(item)
+
+    return ib_content_loads_df
+
+
+def ib_input_submissions_models(clean_raw_df):
+    ib_input_submissions_df = clean_raw_df['ib_input_submissions']
+    ib_input_submissions_df = ib_input_submissions_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'input_content_id',
+                     'variant',
+                     'response']]
+
+    for item in ib_input_submissions_df.to_dict(orient='records'):
+        IBInputSubmissions.parse_obj(item)
+
+    return ib_input_submissions_df
+
+
+def ib_problem_attempts_models(clean_raw_df):
+    ib_problem_attempts_df = clean_raw_df['ib_problem_attempts']
+    ib_problem_attempts_df = ib_problem_attempts_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'pset_content_id',
+                     'pset_problem_content_id',
+                     'variant',
+                     'problem_type',
+                     'response',
+                     'correct',
+                     'attempt',
+                     'final_attempt']]
+
+    for item in ib_problem_attempts_df.to_dict(orient='records'):
+        IBProblemAttempts.parse_obj(item)
+
+    return ib_problem_attempts_df
+
+
 def quiz_attempts_and_multichoice_responses_model(
     clean_raw_df, assessments_df, quiz_multichoice_answers_df
 ):
@@ -507,6 +565,10 @@ def create_models(output_path, all_raw_dfs):
     ib_input_df = ib_input_model(clean_raw_df)
     ib_problem_df = ib_problem_model(clean_raw_df)
     course_contents_df = course_contents_model(clean_raw_df)
+    ib_content_loads_df = ib_content_loads_model(clean_raw_df)
+    ib_problem_attempts_df = ib_problem_attempts_models(clean_raw_df)
+    ib_input_submissions_df = ib_input_submissions_models(clean_raw_df)
+
     (
         quiz_attempts_df,
         quiz_attempt_multichoice_responses_df,
@@ -542,6 +604,12 @@ def create_models(output_path, all_raw_dfs):
         f"{output_path}/{MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES}", "w")\
             as f:
         quiz_attempt_multichoice_responses_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_IB_CONTENT_LOADS}", "w") as f:
+        ib_content_loads_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_IB_PROBLEM_ATTEMPTS}", "w") as f:
+        ib_problem_attempts_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_IB_INPUT_SUBMISSIONS}", "w") as f:
+        ib_input_submissions_df.to_csv(f, index=False)
 
 
 def generate_grade_df(grade_dict):
@@ -787,14 +855,14 @@ def collect_event_data_dfs(events_bucket, events_key):
     ib_input_submissions_stream = s3_client.get_object(
         Bucket=events_bucket,
         Key=key_ib_input_submissions)
-# convert to dataframes. Use json key called data -> will return array of every event.
-    ib_content_loads_data = json.loads(
+
+    ib_content_loads_data = pd.read_json(
         BytesIO(ib_content_loads_stream["Body"].read())
     )
-    ib_problem_attempts_data = json.loads(
+    ib_problem_attempts_data = pd.read_json(
         BytesIO(ib_problem_attempts_stream["Body"].read())
     )
-    ib_input_submissions_data = json.loads(
+    ib_input_submissions_data = pd.read_json(
         BytesIO(ib_input_submissions_stream["Body"].read())
     )
 
@@ -819,11 +887,10 @@ def main():
                         help='bucket for the moodle grade and user data dirs')
     parser.add_argument('data_prefix', type=str,
                         help='prefix for the moodle grade and user data dirs')
-# cahnge comments 
     parser.add_argument('events_bucket', type=str,
-                        help='bucket for the moodle grade and user data dirs')
+                        help='bucket for the event data dirs')
     parser.add_argument('events_prefix', type=str,
-                        help='prefix for the moodle grade and user data dirs')
+                        help='prefix for the event data dirs')
 
     args = parser.parse_args()
 

@@ -23,13 +23,20 @@ def test_compile_models(
         quiz_multichoice_answers,
         ib_input_instances,
         ib_pset_problems,
-        course_contents) = local_file_collections
+        course_contents,
+        ib_content_loads,
+        ib_problem_attempts,
+        ib_input_submissions
+     ) = local_file_collections
 
     s3_client = boto3.client('s3')
     stubber_client = Stubber(s3_client)
 
     data_bucket_name = "sample_bucket"
     data_key = "data_files"
+    event_data_bucket_name = "sample_event_bucket"
+    event_data_key = "event_data_files"
+
     grade_list = {"Contents": [{"Key": "2"}]}
     user_list = {"Contents": [{"Key": "2"}]}
 
@@ -120,12 +127,40 @@ def test_compile_models(
             }
         )
 
+    body = io.BytesIO(ib_content_loads.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': event_data_bucket_name,
+            'Key': f"{event_data_key}/ib_content_loads.json"
+            }
+        )
+
+    body = io.BytesIO(ib_problem_attempts.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': event_data_bucket_name,
+            'Key': f"{event_data_key}/ib_problem_attempts.json"
+            }
+        )
+
+    body = io.BytesIO(ib_input_submissions.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': event_data_bucket_name,
+            'Key': f"{event_data_key}/ib_input_submissions.json"
+            }
+        )
+
     stubber_client.activate()
     mocker.patch('boto3.client', lambda service: s3_client)
 
     mocker.patch(
         "sys.argv",
-        ["", data_bucket_name, data_key]
+        ["", data_bucket_name, data_key, event_data_bucket_name,
+         event_data_key]
     )
     compile_models.main()
 
@@ -224,8 +259,7 @@ def test_compile_models(
         for i in expected_ib_problem_attempts:
             assert i in results
 
-    with open(tmp_path / "expected_ib_input_submissions.csv", 'r') as f:
+    with open(tmp_path / "ib_input_submissions.csv", 'r') as f:
         results = list(csv.DictReader(f))
         for i in expected_ib_input_submissions:
             assert i in results
-# create mocks for input json and output csvs.

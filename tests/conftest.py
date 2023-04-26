@@ -28,6 +28,12 @@ def local_file_collections(test_data_path):
         ib_pset_problems = f.read()
     with open(test_data_path / "course_contents.csv", 'r') as f:
         course_contents = f.read()
+    with open(test_data_path / "ib_content_loads.json", 'r') as f:
+        ib_content_loads = f.read()
+    with open(test_data_path / "ib_problem_attempts.json", 'r') as f:
+        ib_problem_attempts = f.read()
+    with open(test_data_path / "ib_input_submissions.json", 'r') as f:
+        ib_input_submissions = f.read()
 
     return (
         moodle_grades,
@@ -37,9 +43,12 @@ def local_file_collections(test_data_path):
         quiz_multichoice_answers,
         ib_input_instances,
         ib_pset_problems,
-        course_contents
+        course_contents,
+        ib_content_loads,
+        ib_problem_attempts,
+        ib_input_submissions
     )
-# import json files. 
+
 
 @pytest.fixture
 def local_expected_csvs(test_data_path):

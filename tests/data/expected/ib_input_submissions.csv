@@ -1,0 +1,3 @@
+user_uuid,course_id,impression_id,timestamp,content_id,input_content_id,variant,response
+265fcd32-9abc-4348-ad52-29995d8142c0,0,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,55585f64-5717-4562-b3fc-2c963f66afa6,88885f64-5717-4562-b3fc-2c963f66afa6,main,ASDF
+265fcd32-9abc-4348-ad52-29995d8142c0,0,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,55585f64-5717-4562-b3fc-2c963f66afa6,99995f64-5717-4562-b3fc-2c963f66afa6,second,100

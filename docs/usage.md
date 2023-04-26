@@ -31,7 +31,10 @@ Enclave containers can access the following data CSV files:
 * [course_contents.csv](#course_contentscsv)
 * [enrollments.csv](#enrollmentscsv)
 * [grades.csv](#gradescsv)
+* [ib_content_loads.csv](#ib_content_loadscsv)
 * [ib_input_instances.csv](#ib_input_instancescsv)
+* [ib_input_submissions.csv](#ib_input_submissionscsv)
+* [ib_problem_attempts.csv](#ib_problem_attemptscsv)
 * [ib_pset_problems.csv](#ib_pset_problemscsv)
 * [quiz_attempts.csv](#quiz_attemptscsv)
 * [quiz_attempt_multichoice_responses.csv](#quiz_attempt_multichoice_responsescsv)
@@ -84,6 +87,18 @@ Sample files that can be used as illustrative references can be found in this re
 | grade_percentage | float | A value between 0 and 100 that reflects in the course gradebook |
 | time_submitted | int | A Unix timestamp value that reflects when the grade was created (seconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
 
+## `ib_content_loads.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| user_uuid | UUID | User UUID that can be joined against `users.csv` |
+| course_id | int | Course ID that can be joined against `courses.csv` |
+| impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
+| timestamp | int | A Unix timestamp value that reflects when the grade was created (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| content_id | UUID | Content ID that can be joined against `course_contents.csv` |
+| variant | str | Variant name |
+
+
 ## `ib_input_instances.csv`
 
 | Column | Type | Notes |
@@ -93,6 +108,38 @@ Sample files that can be used as illustrative references can be found in this re
 | variant | str | Variant name |
 | content | str | Input content |
 | prompt | str | Prompt content |
+
+## `ib_input_submissions.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| user_uuid | UUID | User UUID that can be joined against `users.csv` |
+| course_id | int | Course ID that can be joined against `courses.csv` |
+| impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
+| timestamp | int | A Unix timestamp value that reflects when the grade was created (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| content_id | UUID | Content ID that can be joined against `course_contents.csv` |
+| input_content_id | UUID | Input content ID that can be joined against `ib_input_instances.csv` via its `id` column |
+| variant | str | Variant name |
+| response | str | User input to the interactive |
+
+## `ib_problem_attempts.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| user_uuid | UUID | User UUID that can be joined against `users.csv` |
+| course_id | int | Course ID that can be joined against `courses.csv` |
+| impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
+| timestamp | int | A Unix timestamp value that reflects when the grade was created (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| content_id | UUID | Content ID that can be joined against `course_contents.csv` |
+| pset_content_id | UUID | Problem set ID that can be joined against `ib_pset_problems.csv` via its `pset_id` column |
+| pset_problem_content_id | UUID | Problem ID that can be joined against `ib_pset_problems.csv` via its `id` column|
+| variant | str | Variant name |
+| problem_type | str | The type of problem (one of 'input', 'dropdown', 'multiselect', or 'multiplechoice') |
+| response | str or str[] when `problem_type` is `multiselect` | User response to the problem |
+| correct | bool | Whether the response was correct |
+| attempt | int | Attempt count for the problem |
+| final_attempt | bool | Whether the attempt was the final allowed attempt for the problem |
+
 
 ## `ib_pset_problems.csv`
 

@@ -1,0 +1,5 @@
+user_uuid,course_id,impression_id,timestamp,content_id,pset_content_id,pset_problem_content_id,variant,problem_type,response,correct,attempt,final_attempt
+265fcd32-9abc-4348-ad52-29995d8142c0,0,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,3fa85f64-5717-4562-b3fc-2c963f66afa7,5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12,743cb23f-527b-44b8-ac3b-39f88f8885b0,main,input,some user input string,False,1,False
+265fcd32-9abc-4348-ad52-29995d8142c0,0,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,3fa85f64-5717-4562-b3fc-2c963f66afa7,5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12,743cb23f-527b-44b8-ac3b-39f88f8885b0,main,dropdown,selected input,False,1,False
+265fcd32-9abc-4348-ad52-29995d8142c0,0,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,3fa85f64-5717-4562-b3fc-2c963f66afa7,5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12,743cb23f-527b-44b8-ac3b-39f88f8885b0,main,multiselect,"['selected input 1', 'selected input 2']",False,1,False
+265fcd32-9abc-4348-ad52-29995d8142c0,0,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,3fa85f64-5717-4562-b3fc-2c963f66afa7,5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12,743cb23f-527b-44b8-ac3b-39f88f8885b0,main,multiplechoice,selected input,False,1,False
