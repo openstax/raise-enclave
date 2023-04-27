@@ -27,11 +27,11 @@ A relatively trivial example of an analysis can be found in this repo [here](../
 Enclave containers can access the following data CSV files:
 
 * [assessments.csv](#assessmentscsv)
+* [content_loads.csv](#content_loadscsv)
 * [courses.csv](#coursescsv)
 * [course_contents.csv](#course_contentscsv)
 * [enrollments.csv](#enrollmentscsv)
 * [grades.csv](#gradescsv)
-* [content_loads.csv](#content_loadscsv)
 * [ib_input_instances.csv](#ib_input_instancescsv)
 * [ib_input_submissions.csv](#ib_input_submissionscsv)
 * [ib_problem_attempts.csv](#ib_problem_attemptscsv)
@@ -52,6 +52,17 @@ Sample files that can be used as illustrative references can be found in this re
 | - | - | - |
 | id | int | A unique assessment ID |
 | name | str | The user friendly name associated with this assessment in course content |
+
+## `content_loads.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| user_uuid | UUID | User UUID that can be joined against `users.csv` |
+| course_id | int | Course ID that can be joined against `courses.csv` |
+| impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
+| timestamp | int | A Unix timestamp value that reflects when the grade was created (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| content_id | UUID | Content ID that can be joined against `course_contents.csv` |
+| variant | str | Variant name |
 
 ## `courses.csv`
 
@@ -86,17 +97,6 @@ Sample files that can be used as illustrative references can be found in this re
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | grade_percentage | float | A value between 0 and 100 that reflects in the course gradebook |
 | time_submitted | int | A Unix timestamp value that reflects when the grade was created (seconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
-
-## `content_loads.csv`
-
-| Column | Type | Notes |
-| - | - | - |
-| user_uuid | UUID | User UUID that can be joined against `users.csv` |
-| course_id | int | Course ID that can be joined against `courses.csv` |
-| impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
-| timestamp | int | A Unix timestamp value that reflects when the grade was created (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
-| content_id | UUID | Content ID that can be joined against `course_contents.csv` |
-| variant | str | Variant name |
 
 ## `ib_input_instances.csv`
 
