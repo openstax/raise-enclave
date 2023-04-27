@@ -467,7 +467,7 @@ def ib_pset_problem_attempts_model(clean_raw_df):
                      'final_attempt']]
 
     ib_pset_problem_attempts_df = filter_events(ib_pset_problem_attempts_df,
-                                           clean_raw_df)
+                                                clean_raw_df)
 
     for item in ib_pset_problem_attempts_df.to_dict(orient='records'):
         IBProblemAttempts.parse_obj(item)
@@ -860,7 +860,8 @@ def collect_content_dfs(bucket, key):
 def collect_event_data_dfs(events_bucket, events_key):
 
     key_content_loads = events_key + "/content_loaded_v1.json"
-    key_ib_pset_problem_attempts = events_key + "/ib_pset_problem_attempted_v1.json"
+    key_ib_pset_problem_attempts = \
+        events_key + "/ib_pset_problem_attempted_v1.json"
     key_ib_input_submissions = events_key + "/ib_input_submitted_v1.json"
 
     s3_client = boto3.client("s3")
