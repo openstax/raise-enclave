@@ -25,7 +25,7 @@ def test_compile_models(
         ib_pset_problems,
         course_contents,
         content_loads,
-        ib_problem_attempts,
+        ib_pset_problem_attempts,
         ib_input_submissions
      ) = local_file_collections
 
@@ -136,7 +136,7 @@ def test_compile_models(
             }
         )
 
-    body = io.BytesIO(ib_problem_attempts.encode('utf-8'))
+    body = io.BytesIO(ib_pset_problem_attempts.encode('utf-8'))
     stubber_client.add_response(
         'get_object', {"Body": body},
         expected_params={
@@ -180,7 +180,7 @@ def test_compile_models(
      expected_quiz_attempts,
      expected_quiz_attempt_multichoice_responses,
      expected_content_loads,
-     expected_ib_problem_attempts,
+     expected_ib_pset_problem_attempts,
      expected_ib_input_submissions
      ) = local_expected_csvs
 
@@ -256,11 +256,11 @@ def test_compile_models(
         for i in expected_content_loads:
             assert i in results
 
-    with open(tmp_path / "ib_problem_attempts.csv", 'r') as f:
+    with open(tmp_path / "ib_pset_problem_attempts.csv", 'r') as f:
         results = list(csv.DictReader(f))
-        assert len(results) == len(expected_ib_problem_attempts)
+        assert len(results) == len(expected_ib_pset_problem_attempts)
 
-        for i in expected_ib_problem_attempts:
+        for i in expected_ib_pset_problem_attempts:
             assert i in results
 
     with open(tmp_path / "ib_input_submissions.csv", 'r') as f:

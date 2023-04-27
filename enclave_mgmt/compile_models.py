@@ -26,7 +26,7 @@ MODEL_QUIZ_ATTEMPTS = "quiz_attempts.csv"
 MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES = \
      "quiz_attempt_multichoice_responses.csv"
 MODEL_CONTENT_LOADS = "content_loads.csv"
-MODEL_IB_PROBLEM_ATTEMPTS = "ib_problem_attempts.csv"
+MODEL_IB_PSET_PROBLEM_ATTEMPTS = "ib_pset_problem_attempts.csv"
 MODEL_IB_INPUT_SUBMISSIONS = "ib_input_submissions.csv"
 
 
@@ -449,9 +449,9 @@ def ib_input_submissions_model(clean_raw_df):
     return ib_input_submissions_df
 
 
-def ib_problem_attempts_model(clean_raw_df):
-    ib_problem_attempts_df = clean_raw_df['ib_problem_attempts']
-    ib_problem_attempts_df = ib_problem_attempts_df[
+def ib_pset_problem_attempts_model(clean_raw_df):
+    ib_pset_problem_attempts_df = clean_raw_df['ib_pset_problem_attempts']
+    ib_pset_problem_attempts_df = ib_pset_problem_attempts_df[
                     ['user_uuid',
                      'course_id',
                      'impression_id',
@@ -466,13 +466,13 @@ def ib_problem_attempts_model(clean_raw_df):
                      'attempt',
                      'final_attempt']]
 
-    ib_problem_attempts_df = filter_events(ib_problem_attempts_df,
+    ib_pset_problem_attempts_df = filter_events(ib_pset_problem_attempts_df,
                                            clean_raw_df)
 
-    for item in ib_problem_attempts_df.to_dict(orient='records'):
+    for item in ib_pset_problem_attempts_df.to_dict(orient='records'):
         IBProblemAttempts.parse_obj(item)
 
-    return ib_problem_attempts_df
+    return ib_pset_problem_attempts_df
 
 
 def quiz_attempts_and_multichoice_responses_model(
@@ -585,7 +585,7 @@ def create_models(output_path, all_raw_dfs):
     ib_problem_df = ib_problem_model(clean_raw_df)
     course_contents_df = course_contents_model(clean_raw_df)
     content_loads_df = content_loads_model(clean_raw_df)
-    ib_problem_attempts_df = ib_problem_attempts_model(clean_raw_df)
+    ib_pset_problem_attempts_df = ib_pset_problem_attempts_model(clean_raw_df)
     ib_input_submissions_df = ib_input_submissions_model(clean_raw_df)
 
     (
@@ -625,8 +625,8 @@ def create_models(output_path, all_raw_dfs):
         quiz_attempt_multichoice_responses_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_CONTENT_LOADS}", "w") as f:
         content_loads_df.to_csv(f, index=False)
-    with open(f"{output_path}/{MODEL_IB_PROBLEM_ATTEMPTS}", "w") as f:
-        ib_problem_attempts_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_IB_PSET_PROBLEM_ATTEMPTS}", "w") as f:
+        ib_pset_problem_attempts_df.to_csv(f, index=False)
     with open(f"{output_path}/{MODEL_IB_INPUT_SUBMISSIONS}", "w") as f:
         ib_input_submissions_df.to_csv(f, index=False)
 
@@ -860,7 +860,7 @@ def collect_content_dfs(bucket, key):
 def collect_event_data_dfs(events_bucket, events_key):
 
     key_content_loads = events_key + "/content_loaded_v1.json"
-    key_ib_problem_attempts = events_key + "/ib_pset_problem_attempted_v1.json"
+    key_ib_pset_problem_attempts = events_key + "/ib_pset_problem_attempted_v1.json"
     key_ib_input_submissions = events_key + "/ib_input_submitted_v1.json"
 
     s3_client = boto3.client("s3")
@@ -868,9 +868,9 @@ def collect_event_data_dfs(events_bucket, events_key):
     content_loads_stream = s3_client.get_object(
         Bucket=events_bucket,
         Key=key_content_loads)
-    ib_problem_attempts_stream = s3_client.get_object(
+    ib_pset_problem_attempts_stream = s3_client.get_object(
         Bucket=events_bucket,
-        Key=key_ib_problem_attempts)
+        Key=key_ib_pset_problem_attempts)
     ib_input_submissions_stream = s3_client.get_object(
         Bucket=events_bucket,
         Key=key_ib_input_submissions)
@@ -880,16 +880,16 @@ def collect_event_data_dfs(events_bucket, events_key):
     )
 
     # Normalize union type for pset attempt response
-    ib_problem_attempts_json = json.loads(
-        ib_problem_attempts_stream["Body"].read()
+    ib_pset_problem_attempts_json = json.loads(
+        ib_pset_problem_attempts_stream["Body"].read()
     )['data']
-    ib_problem_attempts_normalized = []
-    for item in ib_problem_attempts_json:
+    ib_pset_problem_attempts_normalized = []
+    for item in ib_pset_problem_attempts_json:
         item["response"] = \
             item["response"]["string"] or item["response"]["array"]
-        ib_problem_attempts_normalized.append(item)
-    ib_problem_attempts_data = pd.DataFrame(
-        ib_problem_attempts_normalized
+        ib_pset_problem_attempts_normalized.append(item)
+    ib_pset_problem_attempts_data = pd.DataFrame(
+        ib_pset_problem_attempts_normalized
     )
 
     ib_input_submissions_data = pd.DataFrame(
@@ -898,7 +898,7 @@ def collect_event_data_dfs(events_bucket, events_key):
 
     return {
         "content_loads": content_loads_data,
-        "ib_problem_attempts": ib_problem_attempts_data,
+        "ib_pset_problem_attempts": ib_pset_problem_attempts_data,
         "ib_input_submissions": ib_input_submissions_data
     }
 
