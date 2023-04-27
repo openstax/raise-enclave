@@ -1,5 +1,5 @@
 {
-    "data":[
+    "data": [
         {
             "user_uuid": "c6a4a01e-b112-475f-82ff-b051ab1d44e1",
             "course_id": 2,
@@ -12,7 +12,10 @@
             "pset_content_id": "5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12",
             "pset_problem_content_id": "743cb23f-527b-44b8-ac3b-39f88f8885b0",
             "problem_type": "input",
-            "response": "some user input string",
+            "response": {
+                "string": "some user input string",
+                "array": null
+            },
             "correct": false,
             "attempt": 1,
             "final_attempt": false
@@ -29,7 +32,10 @@
             "pset_content_id": "5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12",
             "pset_problem_content_id": "743cb23f-527b-44b8-ac3b-39f88f8885b0",
             "problem_type": "dropdown",
-            "response": "selected input",
+            "response": {
+                "string": "selected input",
+                "array": null
+            },
             "correct": false,
             "attempt": 1,
             "final_attempt": false
@@ -46,10 +52,13 @@
             "pset_content_id": "5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12",
             "pset_problem_content_id": "743cb23f-527b-44b8-ac3b-39f88f8885b0",
             "problem_type": "multiselect",
-            "response": [
-                "selected input 1",
-                "selected input 2"
-            ],
+            "response": {
+                "string": null,
+                "array": [
+                    "selected input 1",
+                    "selected input 2"
+                ]
+            },
             "correct": false,
             "attempt": 1,
             "final_attempt": false
@@ -66,7 +75,10 @@
             "pset_content_id": "5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12",
             "pset_problem_content_id": "743cb23f-527b-44b8-ac3b-39f88f8885b0",
             "problem_type": "multiplechoice",
-            "response": "selected input",
+            "response": {
+                "string": "selected input",
+                "array": null
+            },
             "correct": false,
             "attempt": 1,
             "final_attempt": false
@@ -83,7 +95,10 @@
             "pset_content_id": "5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12",
             "pset_problem_content_id": "743cb23f-527b-44b8-ac3b-39f88f8885b0",
             "problem_type": "multiplechoice",
-            "response": "selected input",
+            "response": {
+                "string": "selected input",
+                "array": null
+            },
             "correct": false,
             "attempt": 1,
             "final_attempt": false

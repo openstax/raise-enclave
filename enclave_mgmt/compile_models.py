@@ -428,7 +428,7 @@ def content_loads_model(clean_raw_df):
     return content_loads_df
 
 
-def ib_input_submissions_models(clean_raw_df):
+def ib_input_submissions_model(clean_raw_df):
     ib_input_submissions_df = clean_raw_df['ib_input_submissions']
     ib_input_submissions_df = ib_input_submissions_df[
                     ['user_uuid',
@@ -449,7 +449,7 @@ def ib_input_submissions_models(clean_raw_df):
     return ib_input_submissions_df
 
 
-def ib_problem_attempts_models(clean_raw_df):
+def ib_problem_attempts_model(clean_raw_df):
     ib_problem_attempts_df = clean_raw_df['ib_problem_attempts']
     ib_problem_attempts_df = ib_problem_attempts_df[
                     ['user_uuid',
@@ -585,8 +585,8 @@ def create_models(output_path, all_raw_dfs):
     ib_problem_df = ib_problem_model(clean_raw_df)
     course_contents_df = course_contents_model(clean_raw_df)
     content_loads_df = content_loads_model(clean_raw_df)
-    ib_problem_attempts_df = ib_problem_attempts_models(clean_raw_df)
-    ib_input_submissions_df = ib_input_submissions_models(clean_raw_df)
+    ib_problem_attempts_df = ib_problem_attempts_model(clean_raw_df)
+    ib_input_submissions_df = ib_input_submissions_model(clean_raw_df)
 
     (
         quiz_attempts_df,
@@ -878,9 +878,20 @@ def collect_event_data_dfs(events_bucket, events_key):
     content_loads_data = pd.DataFrame(
         json.loads(content_loads_stream["Body"].read())['data']
     )
+
+    # Normalize union type for pset attempt response
+    ib_problem_attempts_json = json.loads(
+        ib_problem_attempts_stream["Body"].read()
+    )['data']
+    ib_problem_attempts_normalized = []
+    for item in ib_problem_attempts_json:
+        item["response"] = \
+            item["response"]["string"] or item["response"]["array"]
+        ib_problem_attempts_normalized.append(item)
     ib_problem_attempts_data = pd.DataFrame(
-        json.loads(ib_problem_attempts_stream["Body"].read())['data']
+        ib_problem_attempts_normalized
     )
+
     ib_input_submissions_data = pd.DataFrame(
         json.loads(ib_input_submissions_stream["Body"].read())['data']
     )

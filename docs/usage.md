@@ -26,22 +26,24 @@ A relatively trivial example of an analysis can be found in this repo [here](../
 
 Enclave containers can access the following data CSV files:
 
-* [assessments.csv](#assessmentscsv)
-* [content_loads.csv](#content_loadscsv)
-* [courses.csv](#coursescsv)
-* [course_contents.csv](#course_contentscsv)
-* [enrollments.csv](#enrollmentscsv)
-* [grades.csv](#gradescsv)
-* [ib_input_instances.csv](#ib_input_instancescsv)
-* [ib_input_submissions.csv](#ib_input_submissionscsv)
-* [ib_problem_attempts.csv](#ib_problem_attemptscsv)
-* [ib_pset_problems.csv](#ib_pset_problemscsv)
-* [quiz_attempts.csv](#quiz_attemptscsv)
-* [quiz_attempt_multichoice_responses.csv](#quiz_attempt_multichoice_responsescsv)
-* [quiz_questions.csv](#quiz_questionscsv)
-* [quiz_question_contents.csv](#quiz_question_contentscsv)
-* [quiz_multichoice_answers.csv](#quiz_multichoice_answerscsv)
-* [users.csv](#userscsv)
+| CSV | Description |
+| - | - |
+| [assessments.csv](#assessmentscsv) | The set of assessments (Moodle quizzes) in the course associating name to a unique ID |
+| [content_loads.csv](#content_loadscsv) | Events that occur whenever users load a specific piece of content in `course_contents.csv` |
+| [courses.csv](#coursescsv) | A list of courses associating name to a unique ID |
+| [course_contents.csv](#course_contentscsv) | Information about what part of the course a specific content ID can be associated with |
+| [enrollments.csv](#enrollmentscsv) | Enrollment information mapping users to specific courses and their corresponding role in that course |
+| [grades.csv](#gradescsv) | Gradebook data for a student based upon from assessments (these are the maximum of all attempts on the assessment when multiple exist) |
+| [ib_input_instances.csv](#ib_input_instancescsv) | Details on instances of open input interactives in the course |
+| [ib_input_submissions.csv](#ib_input_submissionscsv) | Events that occur when a user submits to an open input interactive |
+| [ib_pset_problem_attempts.csv](#ib_pset_problem_attemptscsv) | Events that occur when a user submits to a pset problem interactive |
+| [ib_pset_problems.csv](#ib_pset_problemscsv) | Details on instances of pset problem interactives in the course |
+| [quiz_attempts.csv](#quiz_attemptscsv) | Attempt details for Moodle quizzes |
+| [quiz_attempt_multichoice_responses.csv](#quiz_attempt_multichoice_responsescsv) | Question level responses on a quiz attempt |
+| [quiz_questions.csv](#quiz_questionscsv) | Details on the contents of each assessment mapping questions to each assessment |
+| [quiz_question_contents.csv](#quiz_question_contentscsv) | Details on the content of each quiz question by ID |
+| [quiz_multichoice_answers.csv](#quiz_multichoice_answerscsv) | Details on option choices for `multichoice` quiz questions |
+| [users.csv](#userscsv) | User information |
 
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
@@ -121,7 +123,7 @@ Sample files that can be used as illustrative references can be found in this re
 | variant | str | Variant name |
 | response | str | User input to the interactive |
 
-## `ib_problem_attempts.csv`
+## `ib_pset_problem_attempts.csv`
 
 | Column | Type | Notes |
 | - | - | - |

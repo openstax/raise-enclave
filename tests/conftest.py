@@ -31,7 +31,7 @@ def local_file_collections(test_data_path):
     with open(test_data_path / "content_loaded_v1.json", 'r') as f:
         content_loads = f.read()
     with open(test_data_path / "ib_pset_problem_attempted_v1.json", 'r') as f:
-        ib_problem_attempts = f.read()
+        ib_pset_problem_attempts = f.read()
     with open(test_data_path / "ib_input_submitted_v1.json", 'r') as f:
         ib_input_submissions = f.read()
 
@@ -45,7 +45,7 @@ def local_file_collections(test_data_path):
         ib_pset_problems,
         course_contents,
         content_loads,
-        ib_problem_attempts,
+        ib_pset_problem_attempts,
         ib_input_submissions
     )
 
@@ -85,8 +85,9 @@ def local_expected_csvs(test_data_path):
         quiz_attempt_multichoice_responses = list(csv.DictReader(f))
     with open(test_data_path / "expected/content_loads.csv", 'r') as f:
         content_loads = list(csv.DictReader(f))
-    with open(test_data_path / "expected/ib_problem_attempts.csv", 'r') as f:
-        ib_problem_attempts = list(csv.DictReader(f))
+    with open(test_data_path / "expected/ib_pset_problem_attempts.csv", 'r')\
+            as f:
+        ib_pset_problem_attempts = list(csv.DictReader(f))
     with open(test_data_path / "expected/ib_input_submissions.csv", 'r') as f:
         ib_input_submissions = list(csv.DictReader(f))
     return (
@@ -104,7 +105,7 @@ def local_expected_csvs(test_data_path):
         quiz_attempts,
         quiz_attempt_multichoice_responses,
         content_loads,
-        ib_problem_attempts,
+        ib_pset_problem_attempts,
         ib_input_submissions
     )
 
