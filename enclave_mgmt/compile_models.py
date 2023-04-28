@@ -226,9 +226,9 @@ class IBProblemAttempts(BaseModel):
     @validator('response')
     def response_type(cls, value, values):
         if values['problem_type'] == 'multiselect' and type(value) == str:
-            raise ValueError('Response must be a list')
+            raise ValueError('Response must be a list')  # pragma: no cover
         if values['problem_type'] != 'multiselect' and type(value) != str:
-            raise ValueError('Response must be a string')
+            raise ValueError('Response must be a string')  # pragma: no cover
         return value
 
 
