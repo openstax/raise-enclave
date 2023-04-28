@@ -23,13 +23,20 @@ def test_compile_models(
         quiz_multichoice_answers,
         ib_input_instances,
         ib_pset_problems,
-        course_contents) = local_file_collections
+        course_contents,
+        content_loads,
+        ib_pset_problem_attempts,
+        ib_input_submissions
+     ) = local_file_collections
 
     s3_client = boto3.client('s3')
     stubber_client = Stubber(s3_client)
 
     data_bucket_name = "sample_bucket"
     data_key = "data_files"
+    event_data_bucket_name = "sample_event_bucket"
+    event_data_key = "event_data_files"
+
     grade_list = {"Contents": [{"Key": "2"}]}
     user_list = {"Contents": [{"Key": "2"}]}
 
@@ -120,12 +127,40 @@ def test_compile_models(
             }
         )
 
+    body = io.BytesIO(content_loads.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': event_data_bucket_name,
+            'Key': f"{event_data_key}/content_loaded_v1.json"
+            }
+        )
+
+    body = io.BytesIO(ib_pset_problem_attempts.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': event_data_bucket_name,
+            'Key': f"{event_data_key}/ib_pset_problem_attempted_v1.json"
+            }
+        )
+
+    body = io.BytesIO(ib_input_submissions.encode('utf-8'))
+    stubber_client.add_response(
+        'get_object', {"Body": body},
+        expected_params={
+            'Bucket': event_data_bucket_name,
+            'Key': f"{event_data_key}/ib_input_submitted_v1.json"
+            }
+        )
+
     stubber_client.activate()
     mocker.patch('boto3.client', lambda service: s3_client)
 
     mocker.patch(
         "sys.argv",
-        ["", data_bucket_name, data_key]
+        ["", data_bucket_name, data_key, event_data_bucket_name,
+         event_data_key]
     )
     compile_models.main()
 
@@ -143,7 +178,11 @@ def test_compile_models(
      expected_ib_pset_problems,
      expected_course_contents,
      expected_quiz_attempts,
-     expected_quiz_attempt_multichoice_responses) = local_expected_csvs
+     expected_quiz_attempt_multichoice_responses,
+     expected_content_loads,
+     expected_ib_pset_problem_attempts,
+     expected_ib_input_submissions
+     ) = local_expected_csvs
 
     with open(tmp_path / "assessments.csv", 'r') as f:
         results = list(csv.DictReader(f))
@@ -208,4 +247,24 @@ def test_compile_models(
     with open(tmp_path / "quiz_attempt_multichoice_responses.csv", 'r') as f:
         results = list(csv.DictReader(f))
         for i in expected_quiz_attempt_multichoice_responses:
+            assert i in results
+
+    with open(tmp_path / "content_loads.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        assert len(results) == len(expected_content_loads)
+
+        for i in expected_content_loads:
+            assert i in results
+
+    with open(tmp_path / "ib_pset_problem_attempts.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        assert len(results) == len(expected_ib_pset_problem_attempts)
+
+        for i in expected_ib_pset_problem_attempts:
+            assert i in results
+
+    with open(tmp_path / "ib_input_submissions.csv", 'r') as f:
+        results = list(csv.DictReader(f))
+        assert len(results) == len(expected_ib_input_submissions)
+        for i in expected_ib_input_submissions:
             assert i in results

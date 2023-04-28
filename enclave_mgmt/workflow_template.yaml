@@ -24,7 +24,7 @@ spec:
           - |
             mkdir /data/enclave-input
             mkdir /data/enclave-output
-            compile-models raise-data algebra1/ay2022
+            compile-models raise-data algebra1/ay2022 raise-data events
       volumeMounts:
       - name: workdir
         mountPath: /data

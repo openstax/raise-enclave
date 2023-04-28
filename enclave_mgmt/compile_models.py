@@ -9,6 +9,7 @@ import argparse
 import pandas as pd
 from io import BytesIO
 from pydantic import BaseModel, Extra, validator
+from typing import List, Union
 
 MODEL_FILE_USERS = "users.csv"
 MODEL_FILE_COURSES = "courses.csv"
@@ -24,6 +25,9 @@ MODEL_COURSE_CONTENTS = "course_contents.csv"
 MODEL_QUIZ_ATTEMPTS = "quiz_attempts.csv"
 MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES = \
      "quiz_attempt_multichoice_responses.csv"
+MODEL_CONTENT_LOADS = "content_loads.csv"
+MODEL_IB_PSET_PROBLEM_ATTEMPTS = "ib_pset_problem_attempts.csv"
+MODEL_IB_INPUT_SUBMISSIONS = "ib_input_submissions.csv"
 
 
 class Demographic(BaseModel):
@@ -189,6 +193,59 @@ class QuizAttemptMultichoiceResponses(BaseModel):
         extra = Extra.forbid
 
 
+class ContentLoads(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    variant: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class IBProblemAttempts(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    pset_content_id: UUID
+    pset_problem_content_id: UUID
+    variant: str
+    problem_type: str
+    response: Union[str, List[str]]
+    correct: bool
+    attempt: int
+    final_attempt: bool
+
+    class Config:
+        extra = Extra.forbid
+
+    @validator('response')
+    def response_type(cls, value, values):
+        if values['problem_type'] == 'multiselect' and type(value) == str:
+            raise ValueError('Response must be a list')  # pragma: no cover
+        if values['problem_type'] != 'multiselect' and type(value) != str:
+            raise ValueError('Response must be a string')  # pragma: no cover
+        return value
+
+
+class IBInputSubmissions(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    input_content_id: UUID
+    variant: str
+    response: str
+
+    class Config:
+        extra = Extra.forbid
+
+
 def multichoice_answer_model(clean_raw_df):
     quiz_multichoice_answer_df = clean_raw_df['quiz_multichoice_answers']
     quiz_multichoice_answer_df.insert(
@@ -342,6 +399,82 @@ def course_contents_model(clean_raw_df):
     return course_contents_df
 
 
+def filter_events(event_df, clean_raw_df):
+    enrollments_df = clean_raw_df['enrollments']
+    users_df = clean_raw_df['moodle_users'][['user_id', 'uuid']]
+    enrollments_df = pd.merge(enrollments_df, users_df, on='user_id')
+    enrollments_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
+    filter_df = enrollments_df[['user_uuid', 'course_id']]
+    event_df = pd.merge(event_df, filter_df,
+                        on=['user_uuid', 'course_id'])
+    return event_df
+
+
+def content_loads_model(clean_raw_df):
+    content_loads_df = clean_raw_df['content_loads']
+    content_loads_df = content_loads_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'variant']]
+
+    content_loads_df = filter_events(content_loads_df, clean_raw_df)
+
+    for item in content_loads_df.to_dict(orient='records'):
+        ContentLoads.parse_obj(item)
+
+    return content_loads_df
+
+
+def ib_input_submissions_model(clean_raw_df):
+    ib_input_submissions_df = clean_raw_df['ib_input_submissions']
+    ib_input_submissions_df = ib_input_submissions_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'input_content_id',
+                     'variant',
+                     'response']]
+
+    ib_input_submissions_df = filter_events(ib_input_submissions_df,
+                                            clean_raw_df)
+
+    for item in ib_input_submissions_df.to_dict(orient='records'):
+        IBInputSubmissions.parse_obj(item)
+
+    return ib_input_submissions_df
+
+
+def ib_pset_problem_attempts_model(clean_raw_df):
+    ib_pset_problem_attempts_df = clean_raw_df['ib_pset_problem_attempts']
+    ib_pset_problem_attempts_df = ib_pset_problem_attempts_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'pset_content_id',
+                     'pset_problem_content_id',
+                     'variant',
+                     'problem_type',
+                     'response',
+                     'correct',
+                     'attempt',
+                     'final_attempt']]
+
+    ib_pset_problem_attempts_df = filter_events(ib_pset_problem_attempts_df,
+                                                clean_raw_df)
+
+    for item in ib_pset_problem_attempts_df.to_dict(orient='records'):
+        IBProblemAttempts.parse_obj(item)
+
+    return ib_pset_problem_attempts_df
+
+
 def quiz_attempts_and_multichoice_responses_model(
     clean_raw_df, assessments_df, quiz_multichoice_answers_df
 ):
@@ -451,6 +584,10 @@ def create_models(output_path, all_raw_dfs):
     ib_input_df = ib_input_model(clean_raw_df)
     ib_problem_df = ib_problem_model(clean_raw_df)
     course_contents_df = course_contents_model(clean_raw_df)
+    content_loads_df = content_loads_model(clean_raw_df)
+    ib_pset_problem_attempts_df = ib_pset_problem_attempts_model(clean_raw_df)
+    ib_input_submissions_df = ib_input_submissions_model(clean_raw_df)
+
     (
         quiz_attempts_df,
         quiz_attempt_multichoice_responses_df,
@@ -486,6 +623,12 @@ def create_models(output_path, all_raw_dfs):
         f"{output_path}/{MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES}", "w")\
             as f:
         quiz_attempt_multichoice_responses_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_CONTENT_LOADS}", "w") as f:
+        content_loads_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_IB_PSET_PROBLEM_ATTEMPTS}", "w") as f:
+        ib_pset_problem_attempts_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_IB_INPUT_SUBMISSIONS}", "w") as f:
+        ib_input_submissions_df.to_csv(f, index=False)
 
 
 def generate_grade_df(grade_dict):
@@ -714,10 +857,58 @@ def collect_content_dfs(bucket, key):
             }
 
 
-def compile_models(data_bucket, data_key):
+def collect_event_data_dfs(events_bucket, events_key):
+
+    key_content_loads = events_key + "/content_loaded_v1.json"
+    key_ib_pset_problem_attempts = \
+        events_key + "/ib_pset_problem_attempted_v1.json"
+    key_ib_input_submissions = events_key + "/ib_input_submitted_v1.json"
+
+    s3_client = boto3.client("s3")
+
+    content_loads_stream = s3_client.get_object(
+        Bucket=events_bucket,
+        Key=key_content_loads)
+    ib_pset_problem_attempts_stream = s3_client.get_object(
+        Bucket=events_bucket,
+        Key=key_ib_pset_problem_attempts)
+    ib_input_submissions_stream = s3_client.get_object(
+        Bucket=events_bucket,
+        Key=key_ib_input_submissions)
+
+    content_loads_data = pd.DataFrame(
+        json.loads(content_loads_stream["Body"].read())['data']
+    )
+
+    # Normalize union type for pset attempt response
+    ib_pset_problem_attempts_json = json.loads(
+        ib_pset_problem_attempts_stream["Body"].read()
+    )['data']
+    ib_pset_problem_attempts_normalized = []
+    for item in ib_pset_problem_attempts_json:
+        item["response"] = \
+            item["response"]["string"] or item["response"]["array"]
+        ib_pset_problem_attempts_normalized.append(item)
+    ib_pset_problem_attempts_data = pd.DataFrame(
+        ib_pset_problem_attempts_normalized
+    )
+
+    ib_input_submissions_data = pd.DataFrame(
+        json.loads(ib_input_submissions_stream["Body"].read())['data']
+    )
+
+    return {
+        "content_loads": content_loads_data,
+        "ib_pset_problem_attempts": ib_pset_problem_attempts_data,
+        "ib_input_submissions": ib_input_submissions_data
+    }
+
+
+def compile_models(data_bucket, data_key, events_bucket, events_key):
     moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
     content_dfs = collect_content_dfs(data_bucket, data_key)
-    all_raw_dfs = moodle_dfs | content_dfs
+    event_data = collect_event_data_dfs(events_bucket, events_key)
+    all_raw_dfs = moodle_dfs | content_dfs | event_data
     return all_raw_dfs
 
 
@@ -727,13 +918,21 @@ def main():
                         help='bucket for the moodle grade and user data dirs')
     parser.add_argument('data_prefix', type=str,
                         help='prefix for the moodle grade and user data dirs')
+    parser.add_argument('events_bucket', type=str,
+                        help='bucket for the event data dirs')
+    parser.add_argument('events_prefix', type=str,
+                        help='prefix for the event data dirs')
+
     args = parser.parse_args()
 
     output_path = os.environ["CSV_OUTPUT_DIR"]
 
     all_raw_dfs = compile_models(
         args.data_bucket,
-        args.data_prefix)
+        args.data_prefix,
+        args.events_bucket,
+        args.events_prefix
+        )
 
     create_models(output_path, all_raw_dfs)
 
