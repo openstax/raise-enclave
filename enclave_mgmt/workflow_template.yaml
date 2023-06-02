@@ -58,9 +58,6 @@ spec:
       volumeMounts:
       - name: workdir
         mountPath: /data
-      env:
-        - name: RESULT_DIR
-          value: /data/enclave-output
   - name: flow
     dag:
       tasks:
