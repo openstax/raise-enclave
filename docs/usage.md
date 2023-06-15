@@ -24,7 +24,14 @@ A relatively trivial example of an analysis can be found in this repo [here](../
 
 :warning: :construction: The RAISE enclave data model is still in early stages and breaking changes could be introduced as things evolve. :construction: :warning:
 
-Enclave containers can access the following data CSV files:
+Enclave containers can access data serialized in CSV format. Data files are populated in subdirectories dedicated for specific academic years / semesters:
+
+| Path | Academic year / semester |
+| - | - |
+| `{DATA_INPUT_DIR}/ay2022` | Academic year spanning Fall 2022 through Spring 2023 |
+| `{DATA_INPUT_DIR}/su2023` | Summer 2023 semester |
+
+Each path above includes the following data files:
 
 | CSV | Description |
 | - | - |

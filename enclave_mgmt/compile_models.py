@@ -643,7 +643,18 @@ def generate_grade_df(grade_dict):
                     'course_id': course_id,
                     'time_submitted': grade['gradedatesubmitted']
                 })
-    return pd.DataFrame(grade_data)
+    if len(grade_data) != 0:
+        return pd.DataFrame(grade_data)
+    else:
+        return pd.DataFrame(
+            columns=[
+                'user_id',
+                'grade_percentage',
+                'assessment_name',
+                'course_id',
+                'time_submitted'
+            ]
+        )
 
 
 def generate_quiz_data_df(grade_dict):
@@ -677,7 +688,21 @@ def generate_attempts_summary_df(grade_dict):
                         'time_finished': attempt_summary['timefinish'],
                         'attempt_grade': attempt_summary['sumgrades']
                     })
-    return pd.DataFrame(attempt_data)
+    if len(attempt_data) != 0:
+        return pd.DataFrame(attempt_data)
+    else:
+        return pd.DataFrame(
+            columns=[
+                'course_id',
+                'user_id',
+                'quiz_id',
+                'attempt_id',
+                'attempt_number',
+                'time_started',
+                'time_finished',
+                'attempt_grade'
+            ]
+        )
 
 
 def generate_attempt_multichoice_response_df(grade_dict):
@@ -704,7 +729,20 @@ def generate_attempt_multichoice_response_df(grade_dict):
                                     'question_number': question['slot'],
                                 }
                             )
-    return pd.DataFrame(attempt_multichoice_response_data)
+    if len(attempt_multichoice_response_data) != 0:
+        return pd.DataFrame(attempt_multichoice_response_data)
+    else:
+        return pd.DataFrame(
+            columns=[
+                'course_id',
+                'user_id',
+                'quiz_id',
+                'attempt_id',
+                'attempt_number',
+                'answer',
+                'question_number'
+            ]
+        )
 
 
 def generate_enrollment_df(users_dict):

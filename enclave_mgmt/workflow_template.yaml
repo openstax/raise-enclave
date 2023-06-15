@@ -22,15 +22,14 @@ spec:
           - "bash"
           - "-cxe"
           - |
-            mkdir /data/enclave-input
+            mkdir -p /data/enclave-input/ay2022
+            mkdir -p /data/enclave-input/su2023
             mkdir /data/enclave-output
-            compile-models raise-data algebra1/ay2022 raise-data events
+            aws s3 cp --recursive s3://raise-data/algebra1/ay2022/enclave/ /data/enclave-input/ay2022/
+            CSV_OUTPUT_DIR=/data/enclave-input/su2023 compile-models raise-data algebra1/su2023 raise-data events
       volumeMounts:
       - name: workdir
         mountPath: /data
-      env:
-        - name: CSV_OUTPUT_DIR
-          value: /data/enclave-input
   - name: analyze
     container:
       image: {{ image }}
@@ -59,9 +58,6 @@ spec:
       volumeMounts:
       - name: workdir
         mountPath: /data
-      env:
-        - name: RESULT_DIR
-          value: /data/enclave-output
   - name: flow
     dag:
       tasks:
