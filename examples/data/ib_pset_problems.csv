@@ -1,13 +1,13 @@
 id,content_id,variant,content,pset_id,problem_type,solution,solution_options
-7080c78d-298b-40ba-a68d-55d6a93b00fc,04cbe2bf-e9f8-47d5-bca8-4fc6577d75d1,main,"<div class=""os-raise-ib-pset-problem-content"">
+8e8bdba0-2fac-49e6-85bd-c586c5017faf,04cbe2bf-e9f8-47d5-bca8-4fc6577d75d1,main,"<div class=""os-raise-ib-pset-problem-content"">
 <p>Here is content for an input problem</p>
 </div>",7080c78d-298b-40ba-a68d-55d6a93b00fc,input,42,
-7080c78d-298b-40ba-a68d-55d6a93b00fc,04cbe2bf-e9f8-47d5-bca8-4fc6577d75d1,main,"<div class=""os-raise-ib-pset-problem-content"">
+978c2570-e787-4f54-8f39-5f3252177a91,04cbe2bf-e9f8-47d5-bca8-4fc6577d75d1,main,"<div class=""os-raise-ib-pset-problem-content"">
 <p>Here is content for a dropdown problem</p>
 </div>",7080c78d-298b-40ba-a68d-55d6a93b00fc,dropdown,red,"[""red"", ""blue"", ""green""]"
-7080c78d-298b-40ba-a68d-55d6a93b00fc,04cbe2bf-e9f8-47d5-bca8-4fc6577d75d1,main,"<div class=""os-raise-ib-pset-problem-content"">
+df54ed17-f01e-4c37-abab-e6fecdfb6899,04cbe2bf-e9f8-47d5-bca8-4fc6577d75d1,main,"<div class=""os-raise-ib-pset-problem-content"">
 <p>Here is content for a multiple choice problem</p>
 </div>",7080c78d-298b-40ba-a68d-55d6a93b00fc,multiplechoice,red,"[""red"", ""blue"", ""green""]"
-7080c78d-298b-40ba-a68d-55d6a93b00fc,04cbe2bf-e9f8-47d5-bca8-4fc6577d75d1,main,"<div class=""os-raise-ib-pset-problem-content"">
+b265a812-3109-44c8-8de0-83e3d1839740,04cbe2bf-e9f8-47d5-bca8-4fc6577d75d1,main,"<div class=""os-raise-ib-pset-problem-content"">
 <p>Here is content for a multiselect problem</p>
 </div>",7080c78d-298b-40ba-a68d-55d6a93b00fc,multiselect,"[""red"", ""blue""]","[""red"", ""blue"", ""green""]"
