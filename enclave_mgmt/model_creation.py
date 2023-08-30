@@ -1,0 +1,627 @@
+from datetime import datetime
+from typing import Literal
+from uuid import UUID
+from math import isnan
+import pandas as pd
+from pydantic import BaseModel, Extra, validator
+from typing import List, Union
+
+
+MODEL_FILE_USERS = "users.csv"
+MODEL_FILE_COURSES = "courses.csv"
+MODEL_FILE_ENROLLMENTS = "enrollments.csv"
+MODEL_FILE_ASSESSMENTS = "assessments.csv"
+MODEL_FILE_GRADES = "grades.csv"
+MODEL_QUIZ_QUESTIONS = "quiz_questions.csv"
+MODEL_QUIZ_QUESTION_CONTENTS = "quiz_question_contents.csv"
+MODEL_MULTICHOICE_ANSWERS = "quiz_multichoice_answers.csv"
+MODEL_INPUT_INSTANCES = "ib_input_instances.csv"
+MODEL_PSET_PROBLEMS = "ib_pset_problems.csv"
+MODEL_COURSE_CONTENTS = "course_contents.csv"
+MODEL_QUIZ_ATTEMPTS = "quiz_attempts.csv"
+MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES = \
+     "quiz_attempt_multichoice_responses.csv"
+MODEL_CONTENT_LOADS = "content_loads.csv"
+MODEL_IB_PSET_PROBLEM_ATTEMPTS = "ib_pset_problem_attempts.csv"
+MODEL_IB_INPUT_SUBMISSIONS = "ib_input_submissions.csv"
+
+
+class Demographic(BaseModel):
+    user_uuid: UUID
+    birth_date: str
+    sex: Literal['male', 'female']
+    american_indian_or_alaska_native: Literal['true', 'false']
+    asian: Literal['true', 'false']
+    black_or_african_american: Literal['true', 'false']
+    native_hawaiian_or_other_pacific_islander: Literal['true', 'false']
+    white: Literal['true', 'false']
+    demographic_race_two_or_more_races: Literal['true', 'false']
+    hispanic_or_latino_ethnicity: Literal['true', 'false']
+
+    class Config:
+        extra = Extra.forbid
+
+    @validator('birth_date')
+    def birthdate_format(cls, v):
+        datetime.strptime(v, "%Y-%m-%d")
+        return v
+
+
+class Assessment(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class Course(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class Enrollment(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    role: Literal['student', 'teacher']
+
+    class Config:
+        extra = Extra.forbid
+
+
+class Grade(BaseModel):
+    assessment_id: int
+    user_uuid: UUID
+    course_id: int
+    grade_percentage: float
+    time_submitted: int
+
+    class Config:
+        extra = Extra.forbid
+
+    @validator('grade_percentage')
+    def grade_value(cls, v):
+        if isnan(v):
+            raise ValueError('Grade value is nan')
+        if v < 0.0 or v > 100.0:
+            raise ValueError(f'Grade value {v} is out of expected range')
+        return v
+
+
+class User(BaseModel):
+    uuid: UUID
+    first_name: str
+    last_name: str
+    email: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizQuestion(BaseModel):
+    assessment_id: int
+    question_number: int
+    question_id: UUID
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizQuestionContents(BaseModel):
+    id: UUID
+    text: str
+    type: Literal['multichoice', 'multianswer', 'numerical', 'essay']
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizMultichoiceAnswer(BaseModel):
+    id: int
+    question_id: UUID
+    text: str
+    grade: float
+    feedback: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class InputInteractiveBlock(BaseModel):
+    id: UUID
+    content_id: UUID
+    variant: str
+    content: str
+    prompt: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class ProblemSetProblem(BaseModel):
+    id: UUID
+    content_id: UUID
+    variant: str
+    pset_id: UUID
+    content: str
+    problem_type: Literal['input', 'dropdown', 'multiselect', 'multiplechoice']
+    solution: str
+    solution_options: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class CourseContents(BaseModel):
+    section: str
+    activity_name: str
+    lesson_page: str
+    content_id: UUID
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizAttempts(BaseModel):
+    id: int
+    assessment_id: int
+    user_uuid: UUID
+    course_id: int
+    attempt_number: int
+    grade_percentage: float
+    time_started: int
+    time_finished: int
+
+    class Config:
+        extra = Extra.forbid
+
+
+class QuizAttemptMultichoiceResponses(BaseModel):
+    attempt_id: int
+    question_number: int
+    question_id: UUID
+    answer_id: int
+
+    class Config:
+        extra = Extra.forbid
+
+
+class ContentLoads(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    variant: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+class IBProblemAttempts(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    pset_content_id: UUID
+    pset_problem_content_id: UUID
+    variant: str
+    problem_type: str
+    response: Union[str, List[str]]
+    correct: bool
+    attempt: int
+    final_attempt: bool
+
+    class Config:
+        extra = Extra.forbid
+
+    @validator('response')
+    def response_type(cls, value, values):
+        if values['problem_type'] == 'multiselect' and type(value) is str:
+            raise ValueError('Response must be a list')  # pragma: no cover
+        if values['problem_type'] != 'multiselect' and type(value) is not str:
+            raise ValueError('Response must be a string')  # pragma: no cover
+        return value
+
+
+class IBInputSubmissions(BaseModel):
+    user_uuid: UUID
+    course_id: int
+    impression_id: UUID
+    timestamp: int
+    content_id: UUID
+    input_content_id: UUID
+    variant: str
+    response: str
+
+    class Config:
+        extra = Extra.forbid
+
+
+def create_models(output_path, all_raw_dfs):
+
+    clean_raw_df = scrub_raw_dfs(all_raw_dfs)
+
+    assessments_df, grades_df = assessments_and_grades_model(clean_raw_df)
+    users_df = users_model(clean_raw_df)
+    enrollments_df = enrollments_model(clean_raw_df)
+    courses_df = courses_model(clean_raw_df)
+    quiz_questions_df = questions_model(clean_raw_df, assessments_df)
+    quiz_question_contents_df = question_contents_model(clean_raw_df)
+    quiz_multichoice_answers_df = multichoice_answer_model(clean_raw_df)
+    ib_input_df = ib_input_model(clean_raw_df)
+    ib_problem_df = ib_problem_model(clean_raw_df)
+    course_contents_df = course_contents_model(clean_raw_df)
+    content_loads_df = content_loads_model(clean_raw_df)
+    ib_pset_problem_attempts_df = ib_pset_problem_attempts_model(clean_raw_df)
+    ib_input_submissions_df = ib_input_submissions_model(clean_raw_df)
+
+    (
+        quiz_attempts_df,
+        quiz_attempt_multichoice_responses_df,
+    ) = quiz_attempts_and_multichoice_responses_model(
+        clean_raw_df, assessments_df, quiz_multichoice_answers_df
+    )
+
+    with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
+        users_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_FILE_GRADES}", "w") as f:
+        grades_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_FILE_ENROLLMENTS}", "w") as f:
+        enrollments_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_FILE_COURSES}", "w") as f:
+        courses_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_FILE_ASSESSMENTS}", "w") as f:
+        assessments_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_QUIZ_QUESTIONS}", "w") as f:
+        quiz_questions_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_QUIZ_QUESTION_CONTENTS}", "w") as f:
+        quiz_question_contents_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_MULTICHOICE_ANSWERS}", "w") as f:
+        quiz_multichoice_answers_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_INPUT_INSTANCES}", "w") as f:
+        ib_input_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_PSET_PROBLEMS}", "w") as f:
+        ib_problem_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_COURSE_CONTENTS}", "w") as f:
+        course_contents_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_QUIZ_ATTEMPTS}", "w") as f:
+        quiz_attempts_df.to_csv(f, index=False)
+    with open(
+        f"{output_path}/{MODEL_QUIZ_ATTEMPT_MULTICHOICE_RESPONSES}", "w")\
+            as f:
+        quiz_attempt_multichoice_responses_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_CONTENT_LOADS}", "w") as f:
+        content_loads_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_IB_PSET_PROBLEM_ATTEMPTS}", "w") as f:
+        ib_pset_problem_attempts_df.to_csv(f, index=False)
+    with open(f"{output_path}/{MODEL_IB_INPUT_SUBMISSIONS}", "w") as f:
+        ib_input_submissions_df.to_csv(f, index=False)
+
+
+def scrub_raw_dfs(all_raw_dfs):
+    moodle_users_df = all_raw_dfs['moodle_users']
+
+    moodle_users_df['email'] = moodle_users_df['email'].apply(
+        lambda col: col.lower())
+
+    grade_df = all_raw_dfs['grades']
+    grade_df = grade_df[grade_df['assessment_name'].notnull()]
+
+    all_raw_dfs['moodle_users'] = moodle_users_df
+    all_raw_dfs['grades'] = grade_df
+    return all_raw_dfs
+
+
+def multichoice_answer_model(clean_raw_df):
+    quiz_multichoice_answer_df = clean_raw_df['quiz_multichoice_answers']
+    quiz_multichoice_answer_df.insert(
+        0, 'id', quiz_multichoice_answer_df.index
+    )
+    for item in quiz_multichoice_answer_df.to_dict(orient='records'):
+        QuizMultichoiceAnswer.parse_obj(item)
+    return quiz_multichoice_answer_df
+
+
+def question_contents_model(clean_raw_df):
+    quiz_question_contents_df = clean_raw_df['quiz_question_contents']
+    for item in quiz_question_contents_df.to_dict(orient='records'):
+        QuizQuestionContents.parse_obj(item)
+    return quiz_question_contents_df
+
+
+def questions_model(clean_raw_df, assessments_df):
+    quiz_questions_df = clean_raw_df['quiz_questions']
+    quiz_questions_df = pd.merge(
+        quiz_questions_df, assessments_df, left_on='quiz_name', right_on='name'
+    )
+    quiz_questions_df.rename(columns={'id': 'assessment_id'}, inplace=True)
+    quiz_questions_df = quiz_questions_df[
+        ['assessment_id',
+         'question_number',
+         'question_id']
+    ]
+    for item in quiz_questions_df.to_dict(orient='records'):
+        QuizQuestion.parse_obj(item)
+    return quiz_questions_df
+
+
+def courses_model(clean_raw_df):
+    courses_df = clean_raw_df['courses']
+
+    for item in courses_df.to_dict(orient='records'):
+        Course.parse_obj(item)
+
+    return courses_df
+
+
+def enrollments_model(clean_raw_df):
+    enrollments_df = clean_raw_df['enrollments']
+    users_df = clean_raw_df['moodle_users'][['user_id', 'uuid']]
+    enrollments_df = pd.merge(enrollments_df, users_df, on='user_id')
+    enrollments_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
+    enrollments_df = enrollments_df[['user_uuid', 'course_id', 'role']]
+
+    for item in enrollments_df.to_dict(orient='records'):
+        Enrollment.parse_obj(item)
+
+    return enrollments_df
+
+
+def users_model(clean_raw_df):
+    users_df = clean_raw_df['moodle_users']
+    users_df = users_df[['uuid', 'first_name', 'last_name', 'email']]
+
+    for item in users_df.to_dict(orient='records'):
+        User.parse_obj(item)
+
+    return users_df
+
+
+def assessments_and_grades_model(clean_raw_df):
+    grades_df = clean_raw_df['grades']
+    assessments_df = pd.DataFrame(
+        grades_df['assessment_name'].unique(), columns=['name']
+    )
+    assessments_df['id'] = assessments_df.index
+    grades_df = pd.merge(
+        grades_df, assessments_df, left_on='assessment_name', right_on='name'
+    )
+    grades_df.rename(columns={'id': 'assessment_id'}, inplace=True)
+    moodle_users = clean_raw_df['moodle_users'][['user_id', 'uuid']]
+    grades_df = pd.merge(grades_df, moodle_users, on='user_id')
+    grades_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
+    grades_df = grades_df[
+        ['assessment_id',
+         'user_uuid',
+         'course_id',
+         'grade_percentage',
+         'time_submitted'
+         ]
+    ]
+
+    def convert_percentage(x):
+        if x == '-':
+            return None
+        return float(x.strip("%"))
+
+    grades_df['grade_percentage'] = grades_df['grade_percentage'].map(
+        convert_percentage
+    )
+    grades_df = grades_df[grades_df['grade_percentage'].notnull()]
+    grades_df['time_submitted'] = grades_df['time_submitted'].astype(int)
+
+    for item in assessments_df.to_dict(orient='records'):
+        Assessment.parse_obj(item)
+    for item in grades_df.to_dict(orient='records'):
+        Grade.parse_obj(item)
+
+    return assessments_df, grades_df
+
+
+def ib_input_model(clean_raw_df):
+    ib_input_df = clean_raw_df['ib_input_instances']
+    ib_input_df = ib_input_df[
+                ['id',
+                 'content_id',
+                 'variant',
+                 'content',
+                 'prompt']]
+
+    for item in ib_input_df.to_dict(orient='records'):
+        InputInteractiveBlock.parse_obj(item)
+
+    return ib_input_df
+
+
+def ib_problem_model(clean_raw_df):
+    ib_problem_df = clean_raw_df['ib_pset_problems']
+    ib_problem_df = ib_problem_df[
+                  ['id',
+                   'content_id',
+                   'variant',
+                   'pset_id',
+                   'content',
+                   'problem_type',
+                   'solution',
+                   'solution_options']]
+
+    for item in ib_problem_df.to_dict(orient='records'):
+        ProblemSetProblem.parse_obj(item)
+
+    return ib_problem_df
+
+
+def course_contents_model(clean_raw_df):
+    course_contents_df = clean_raw_df['course_contents']
+    course_contents_df = course_contents_df[
+                  ['section',
+                   'activity_name',
+                   'lesson_page',
+                   'content_id']]
+
+    for item in course_contents_df.to_dict(orient='records'):
+        CourseContents.parse_obj(item)
+
+    return course_contents_df
+
+
+def filter_events(event_df, clean_raw_df):
+    enrollments_df = clean_raw_df['enrollments']
+    users_df = clean_raw_df['moodle_users'][['user_id', 'uuid']]
+    enrollments_df = pd.merge(enrollments_df, users_df, on='user_id')
+    enrollments_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
+    filter_df = enrollments_df[['user_uuid', 'course_id']]
+    event_df = pd.merge(event_df, filter_df,
+                        on=['user_uuid', 'course_id'])
+    return event_df
+
+
+def content_loads_model(clean_raw_df):
+    content_loads_df = clean_raw_df['content_loads']
+    content_loads_df = content_loads_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'variant']]
+
+    content_loads_df = filter_events(content_loads_df, clean_raw_df)
+
+    for item in content_loads_df.to_dict(orient='records'):
+        ContentLoads.parse_obj(item)
+
+    return content_loads_df
+
+
+def ib_input_submissions_model(clean_raw_df):
+    ib_input_submissions_df = clean_raw_df['ib_input_submissions']
+    ib_input_submissions_df = ib_input_submissions_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'input_content_id',
+                     'variant',
+                     'response']]
+
+    ib_input_submissions_df = filter_events(ib_input_submissions_df,
+                                            clean_raw_df)
+
+    for item in ib_input_submissions_df.to_dict(orient='records'):
+        IBInputSubmissions.parse_obj(item)
+
+    return ib_input_submissions_df
+
+
+def ib_pset_problem_attempts_model(clean_raw_df):
+    ib_pset_problem_attempts_df = clean_raw_df['ib_pset_problem_attempts']
+    ib_pset_problem_attempts_df = ib_pset_problem_attempts_df[
+                    ['user_uuid',
+                     'course_id',
+                     'impression_id',
+                     'timestamp',
+                     'content_id',
+                     'pset_content_id',
+                     'pset_problem_content_id',
+                     'variant',
+                     'problem_type',
+                     'response',
+                     'correct',
+                     'attempt',
+                     'final_attempt']]
+
+    ib_pset_problem_attempts_df = filter_events(ib_pset_problem_attempts_df,
+                                                clean_raw_df)
+
+    for item in ib_pset_problem_attempts_df.to_dict(orient='records'):
+        IBProblemAttempts.parse_obj(item)
+
+    return ib_pset_problem_attempts_df
+
+
+def quiz_attempts_and_multichoice_responses_model(
+    clean_raw_df, assessments_df, quiz_multichoice_answers_df
+):
+
+    quiz_data = clean_raw_df['quiz_data']
+    quiz_questions = clean_raw_df['quiz_questions']
+    attempts_summary = clean_raw_df['attempts_summary']
+    attempt_multichoice_response = clean_raw_df['attempt_multichoice_response']
+    quiz_attempts_df = pd.merge(
+        attempts_summary, quiz_data[['quiz_id', 'max_grade', 'quiz_name']],
+        on='quiz_id'
+    )
+    users_df = clean_raw_df['moodle_users'][['user_id', 'uuid']]
+    quiz_attempts_df = pd.merge(quiz_attempts_df, users_df, on='user_id')
+    quiz_attempts_df.rename(columns={'uuid': 'user_uuid'}, inplace=True)
+    quiz_attempts_df = pd.merge(
+        quiz_attempts_df, assessments_df, left_on='quiz_name', right_on='name'
+    )
+    quiz_attempts_df.rename(columns={'id': 'assessment_id'}, inplace=True)
+    quiz_attempts_df['id'] = quiz_attempts_df.index
+    quiz_attempt_multichoice_responses_df = pd.merge(
+        attempt_multichoice_response,
+        quiz_attempts_df[['id', 'attempt_id']],
+        on='attempt_id',
+    )
+    quiz_attempt_multichoice_responses_df.rename(
+        columns={'attempt_id': 'moodle_attempt_id'}, inplace=True
+    )
+    quiz_attempt_multichoice_responses_df.rename(
+        columns={'id': 'attempt_id'}, inplace=True
+    )
+    quiz_attempt_multichoice_responses_df = pd.merge(
+        quiz_attempt_multichoice_responses_df,
+        quiz_data[['quiz_id', 'quiz_name']],
+        on='quiz_id',
+    )
+    quiz_attempt_multichoice_responses_df = pd.merge(
+        quiz_attempt_multichoice_responses_df,
+        quiz_questions,
+        on=['quiz_name', 'question_number'],
+    )
+    quiz_attempt_multichoice_responses_df = pd.merge(
+        quiz_attempt_multichoice_responses_df,
+        quiz_multichoice_answers_df[['id', 'question_id', 'text']],
+        left_on=['question_id', 'answer'],
+        right_on=['question_id', 'text'],
+    )
+    quiz_attempt_multichoice_responses_df.rename(
+        columns={'id': 'answer_id'}, inplace=True
+    )
+    quiz_attempts_df['grade_percentage'] = 100 * (
+        quiz_attempts_df['attempt_grade'] / quiz_attempts_df['max_grade']
+    )
+    quiz_attempts_df = quiz_attempts_df[
+        [
+            'id',
+            'assessment_id',
+            'user_uuid',
+            'course_id',
+            'attempt_number',
+            'grade_percentage',
+            'time_started',
+            'time_finished',
+        ]
+    ]
+
+    quiz_attempt_multichoice_responses_df = \
+        quiz_attempt_multichoice_responses_df[['attempt_id',
+                                               'question_number',
+                                               'question_id',
+                                               'answer_id']]
+
+    for item in quiz_attempts_df.to_dict(orient='records'):
+        QuizAttempts.parse_obj(item)
+
+    for item in quiz_attempt_multichoice_responses_df\
+            .to_dict(orient='records'):
+        QuizAttemptMultichoiceResponses.parse_obj(item)
+    return quiz_attempts_df, quiz_attempt_multichoice_responses_df
