@@ -2,7 +2,7 @@ from enclave_mgmt import create_workflow
 import yaml
 
 
-def test_compile_workflow(tmp_path, mocker):
+def test_create_workflow(tmp_path, mocker):
 
     mocker.patch(
         "sys.argv",
