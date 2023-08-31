@@ -41,7 +41,7 @@ The compile models script is designed to facilitate the process of data collecti
 * The `data_collection.py` script leverages the `boto3` library to interact with S3 and uses the `pandas` to create dataframes for subsequent processing.
 
 3. **model_creation.py**
-* The `model_creation.py` script takes the data collected by `data_collection.py` and transforms it to be used in the Pydantic models. This process also validates the data collected.
+* The `model_creation.py` script takes the data collected by `data_collection.py` and transforms it to be used in the Pydantic models. This process also validates the data.
 
 4. **models.py**
 * The `models.py` script acts as a centralized location for storing the Pydantic models. 
