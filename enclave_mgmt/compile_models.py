@@ -1,9 +1,8 @@
 import os
 import argparse
 
-from enclave_mgmt.data_collection import collect_content_dfs, \
-                                         collect_event_data_dfs, \
-                                         collect_moodle_dfs
+from enclave_mgmt.data_collection import (
+    collect_content_dfs, collect_event_data_dfs, collect_moodle_dfs)
 from enclave_mgmt.model_creation import create_models
 
 
