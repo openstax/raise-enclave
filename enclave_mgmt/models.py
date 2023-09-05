@@ -1,30 +1,8 @@
 from pydantic import BaseModel, Extra, validator
 from typing import List, Union
 from uuid import UUID
-from datetime import datetime
 from typing import Literal
 from math import isnan
-
-
-class Demographic(BaseModel):
-    user_uuid: UUID
-    birth_date: str
-    sex: Literal['male', 'female']
-    american_indian_or_alaska_native: Literal['true', 'false']
-    asian: Literal['true', 'false']
-    black_or_african_american: Literal['true', 'false']
-    native_hawaiian_or_other_pacific_islander: Literal['true', 'false']
-    white: Literal['true', 'false']
-    demographic_race_two_or_more_races: Literal['true', 'false']
-    hispanic_or_latino_ethnicity: Literal['true', 'false']
-
-    class Config:
-        extra = Extra.forbid
-
-    @validator('birth_date')
-    def birthdate_format(cls, v):
-        datetime.strptime(v, "%Y-%m-%d")
-        return v
 
 
 class Assessment(BaseModel):
@@ -140,7 +118,6 @@ class CourseContents(BaseModel):
     activity_name: str
     lesson_page: str
     content_id: UUID
-    visible: str
 
     class Config:
         extra = Extra.forbid

@@ -5,6 +5,14 @@ from io import BytesIO
 from uuid import uuid4
 
 
+def collect_data(data_bucket, data_key, events_bucket, events_key):
+    moodle_dfs = collect_moodle_dfs(data_bucket, data_key)
+    content_dfs = collect_content_dfs(data_bucket, data_key)
+    event_data = collect_event_data_dfs(events_bucket, events_key)
+    all_raw_dfs = moodle_dfs | content_dfs | event_data
+    return all_raw_dfs
+
+
 def collect_moodle_dfs(bucket, prefix):
     grades_dict, users_dict = {}, {}
     s3_client = boto3.client("s3")

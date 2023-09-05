@@ -248,7 +248,6 @@ def course_contents_model(clean_raw_df):
                    'activity_name',
                    'lesson_page',
                    'content_id',
-                   'visible'
                    ]]
 
     for item in course_contents_df.to_dict(orient='records'):

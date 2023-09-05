@@ -89,7 +89,6 @@ Sample files that can be used as illustrative references can be found in this re
 | activity_name | str | Activity name |
 | lesson_page | str | Lesson page name |
 | content_id | UUID | Content page UUID |
-| visible | str | Visibility of activity to students |
 
 ## `enrollments.csv`
 
