@@ -28,3 +28,20 @@ Code coverage reports can be generated when running tests:
 $ pytest --cov=enclave_mgmt --cov-report=term --cov-report=html
 ```
 
+## Compile Models
+
+The compile models script is designed to facilitate the process of data collection and validation for researchers.
+
+### File descriptions
+
+1. **compile_models.py**
+* This script serves as the entry point. It orchestrates the execution of various components.
+
+2. **collect_data.py**
+* The `collect_data.py` script leverages the `boto3` library to interact with S3 and uses the `pandas` library to create dataframes for subsequent processing.
+
+3. **create_models.py**
+* The `create_models.py` script takes the data collected by `collect_data.py` and transforms it to be used in the Pydantic models. This process also validates the data.
+
+4. **models.py**
+* The `models.py` script acts as a centralized location for storing the Pydantic models. 
