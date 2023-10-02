@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Extra, validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from typing import List, Union
 from uuid import UUID
 from typing import Literal
@@ -9,16 +9,14 @@ class Assessment(BaseModel):
     id: int
     name: str
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class Course(BaseModel):
     id: int
     name: str
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class Enrollment(BaseModel):
@@ -26,8 +24,7 @@ class Enrollment(BaseModel):
     course_id: int
     role: Literal['student', 'teacher']
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class Grade(BaseModel):
@@ -37,10 +34,10 @@ class Grade(BaseModel):
     grade_percentage: float
     time_submitted: int
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
-    @validator('grade_percentage')
+    @field_validator('grade_percentage')
+    @classmethod
     def grade_value(cls, v):
         if isnan(v):
             raise ValueError('Grade value is nan')
@@ -55,8 +52,7 @@ class User(BaseModel):
     last_name: str
     email: str
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class QuizQuestion(BaseModel):
@@ -64,8 +60,7 @@ class QuizQuestion(BaseModel):
     question_number: int
     question_id: UUID
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class QuizQuestionContents(BaseModel):
@@ -73,8 +68,7 @@ class QuizQuestionContents(BaseModel):
     text: str
     type: Literal['multichoice', 'multianswer', 'numerical', 'essay']
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class QuizMultichoiceAnswer(BaseModel):
@@ -84,8 +78,7 @@ class QuizMultichoiceAnswer(BaseModel):
     grade: float
     feedback: str
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class InputInteractiveBlock(BaseModel):
@@ -95,8 +88,7 @@ class InputInteractiveBlock(BaseModel):
     content: str
     prompt: str
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class ProblemSetProblem(BaseModel):
@@ -109,8 +101,7 @@ class ProblemSetProblem(BaseModel):
     solution: str
     solution_options: str
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class CourseContents(BaseModel):
@@ -119,8 +110,7 @@ class CourseContents(BaseModel):
     lesson_page: str
     content_id: UUID
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class QuizAttempts(BaseModel):
@@ -133,8 +123,7 @@ class QuizAttempts(BaseModel):
     time_started: int
     time_finished: int
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class QuizAttemptMultichoiceResponses(BaseModel):
@@ -143,8 +132,7 @@ class QuizAttemptMultichoiceResponses(BaseModel):
     question_id: UUID
     answer_id: int
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class ContentLoads(BaseModel):
@@ -155,8 +143,7 @@ class ContentLoads(BaseModel):
     content_id: UUID
     variant: str
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
 
 class IBProblemAttempts(BaseModel):
@@ -174,16 +161,16 @@ class IBProblemAttempts(BaseModel):
     attempt: int
     final_attempt: bool
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')
 
-    @validator('response')
-    def response_type(cls, value, values):
-        if values['problem_type'] == 'multiselect' and type(value) is str:
-            raise ValueError('Response must be a list')  # pragma: no cover
-        if values['problem_type'] != 'multiselect' and type(value) is not str:
-            raise ValueError('Response must be a string')  # pragma: no cover
-        return value
+    @model_validator(mode='after')
+    def response_type(self):
+        if self.problem_type == 'multiselect' and type(self.response) is str:
+            raise ValueError('Response must be a list')
+        if self.problem_type != 'multiselect' and \
+           type(self.response) is not str:
+            raise ValueError('Response must be a string')
+        return self
 
 
 class IBInputSubmissions(BaseModel):
@@ -196,5 +183,4 @@ class IBInputSubmissions(BaseModel):
     variant: str
     response: str
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra='forbid')

@@ -108,14 +108,14 @@ def multichoice_answer_model(clean_raw_df):
         0, 'id', quiz_multichoice_answer_df.index
     )
     for item in quiz_multichoice_answer_df.to_dict(orient='records'):
-        QuizMultichoiceAnswer.parse_obj(item)
+        QuizMultichoiceAnswer.model_validate(item)
     return quiz_multichoice_answer_df
 
 
 def question_contents_model(clean_raw_df):
     quiz_question_contents_df = clean_raw_df['quiz_question_contents']
     for item in quiz_question_contents_df.to_dict(orient='records'):
-        QuizQuestionContents.parse_obj(item)
+        QuizQuestionContents.model_validate(item)
     return quiz_question_contents_df
 
 
@@ -131,7 +131,7 @@ def questions_model(clean_raw_df, assessments_df):
          'question_id']
     ]
     for item in quiz_questions_df.to_dict(orient='records'):
-        QuizQuestion.parse_obj(item)
+        QuizQuestion.model_validate(item)
     return quiz_questions_df
 
 
@@ -139,7 +139,7 @@ def courses_model(clean_raw_df):
     courses_df = clean_raw_df['courses']
 
     for item in courses_df.to_dict(orient='records'):
-        Course.parse_obj(item)
+        Course.model_validate(item)
 
     return courses_df
 
@@ -152,7 +152,7 @@ def enrollments_model(clean_raw_df):
     enrollments_df = enrollments_df[['user_uuid', 'course_id', 'role']]
 
     for item in enrollments_df.to_dict(orient='records'):
-        Enrollment.parse_obj(item)
+        Enrollment.model_validate(item)
 
     return enrollments_df
 
@@ -162,7 +162,7 @@ def users_model(clean_raw_df):
     users_df = users_df[['uuid', 'first_name', 'last_name', 'email']]
 
     for item in users_df.to_dict(orient='records'):
-        User.parse_obj(item)
+        User.model_validate(item)
 
     return users_df
 
@@ -201,9 +201,9 @@ def assessments_and_grades_model(clean_raw_df):
     grades_df['time_submitted'] = grades_df['time_submitted'].astype(int)
 
     for item in assessments_df.to_dict(orient='records'):
-        Assessment.parse_obj(item)
+        Assessment.model_validate(item)
     for item in grades_df.to_dict(orient='records'):
-        Grade.parse_obj(item)
+        Grade.model_validate(item)
 
     return assessments_df, grades_df
 
@@ -218,7 +218,7 @@ def ib_input_model(clean_raw_df):
                  'prompt']]
 
     for item in ib_input_df.to_dict(orient='records'):
-        InputInteractiveBlock.parse_obj(item)
+        InputInteractiveBlock.model_validate(item)
 
     return ib_input_df
 
@@ -236,7 +236,7 @@ def ib_problem_model(clean_raw_df):
                    'solution_options']]
 
     for item in ib_problem_df.to_dict(orient='records'):
-        ProblemSetProblem.parse_obj(item)
+        ProblemSetProblem.model_validate(item)
 
     return ib_problem_df
 
@@ -251,7 +251,7 @@ def course_contents_model(clean_raw_df):
                    ]]
 
     for item in course_contents_df.to_dict(orient='records'):
-        CourseContents.parse_obj(item)
+        CourseContents.model_validate(item)
 
     return course_contents_df
 
@@ -280,7 +280,7 @@ def content_loads_model(clean_raw_df):
     content_loads_df = filter_events(content_loads_df, clean_raw_df)
 
     for item in content_loads_df.to_dict(orient='records'):
-        ContentLoads.parse_obj(item)
+        ContentLoads.model_validate(item)
 
     return content_loads_df
 
@@ -301,7 +301,7 @@ def ib_input_submissions_model(clean_raw_df):
                                             clean_raw_df)
 
     for item in ib_input_submissions_df.to_dict(orient='records'):
-        IBInputSubmissions.parse_obj(item)
+        IBInputSubmissions.model_validate(item)
 
     return ib_input_submissions_df
 
@@ -327,7 +327,7 @@ def ib_pset_problem_attempts_model(clean_raw_df):
                                                 clean_raw_df)
 
     for item in ib_pset_problem_attempts_df.to_dict(orient='records'):
-        IBProblemAttempts.parse_obj(item)
+        IBProblemAttempts.model_validate(item)
 
     return ib_pset_problem_attempts_df
 
@@ -405,9 +405,9 @@ def quiz_attempts_and_multichoice_responses_model(
                                                'answer_id']]
 
     for item in quiz_attempts_df.to_dict(orient='records'):
-        QuizAttempts.parse_obj(item)
+        QuizAttempts.model_validate(item)
 
     for item in quiz_attempt_multichoice_responses_df\
             .to_dict(orient='records'):
-        QuizAttemptMultichoiceResponses.parse_obj(item)
+        QuizAttemptMultichoiceResponses.model_validate(item)
     return quiz_attempts_df, quiz_attempt_multichoice_responses_df
