@@ -90,23 +90,32 @@ def collect_content_dfs(bucket, key):
         Bucket=bucket,
         Key=key_course_contents)
 
+    # By default pandas will use NaN for empty values in CSVs. We pass
+    # keep_default_na=False to avoid this behavior as it will otherwise
+    # cause validation errors
     quiz_question_data = pd.read_csv(
-        BytesIO(quiz_question_stream["Body"].read())
+        BytesIO(quiz_question_stream["Body"].read()),
+        keep_default_na=False
     )
     quiz_question_contents_data = pd.read_csv(
-        BytesIO(quiz_question_contents_stream["Body"].read())
+        BytesIO(quiz_question_contents_stream["Body"].read()),
+        keep_default_na=False
     )
     quiz_multichoice_answers_data = pd.read_csv(
         BytesIO(quiz_multichoice_answers_stream["Body"].read()),
+        keep_default_na=False
     )
     ib_input_instances_data = pd.read_csv(
         BytesIO(ib_input_instances_stream["Body"].read()),
+        keep_default_na=False
     )
     ib_pset_problems_data = pd.read_csv(
         BytesIO(ib_pset_problems_stream["Body"].read()),
+        keep_default_na=False
     )
     course_contents_data = pd.read_csv(
         BytesIO(course_contents_stream["Body"].read()),
+        keep_default_na=False
     )
 
     return {"quiz_questions": quiz_question_data,
