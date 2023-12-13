@@ -1,3 +1,4 @@
 user_uuid,course_id,impression_id,timestamp,content_id,variant
 c6a4a01e-b112-475f-82ff-b051ab1d44e1,2,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,3fa85f64-5717-4562-b3fc-2c963f66afa7,string
 546f4dbc-9488-4147-87d4-c2bae1bd8b97,2,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,3fa85f64-5717-4562-b3fc-2c963f66afa7,string
+d35a986b-a7ad-4c61-8e76-205eccaf9a06,3,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,3fa85f64-5717-4562-b3fc-2c963f66afa7,string

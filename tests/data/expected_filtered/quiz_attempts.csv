@@ -1,0 +1,2 @@
+id,assessment_id,user_uuid,course_id,attempt_number,grade_percentage,time_started,time_finished
+6,1,d35a986b-a7ad-4c61-8e76-205eccaf9a06,3,1,0.0,1650122648,1661272078

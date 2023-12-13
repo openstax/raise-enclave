@@ -1,0 +1,2 @@
+user_uuid,course_id,impression_id,timestamp,content_id,pset_content_id,pset_problem_content_id,variant,problem_type,response,correct,attempt,final_attempt
+d35a986b-a7ad-4c61-8e76-205eccaf9a06,3,3fa85f64-5717-4562-b3fc-2c963f66afa6,0,3fa85f64-5717-4562-b3fc-2c963f66afa7,5dac90ce-fdbc-4ea9-bfe3-fccd13fa9d12,743cb23f-527b-44b8-ac3b-39f88f8885b0,main,multiplechoice,selected input,False,1,False
