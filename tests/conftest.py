@@ -12,10 +12,14 @@ def test_data_path():
 
 @pytest.fixture
 def local_file_collections(test_data_path):
-    with open(test_data_path / "users.json", "r") as f:
-        moodle_users = json.load(f)
-    with open(test_data_path / "grades.json", 'r') as f:
-        moodle_grades = json.load(f)
+    with open(test_data_path / "users_2.json", "r") as f:
+        moodle_users_2 = json.load(f)
+    with open(test_data_path / "grades_2.json", 'r') as f:
+        moodle_grades_2 = json.load(f)
+    with open(test_data_path / "users_3.json", "r") as f:
+        moodle_users_3 = json.load(f)
+    with open(test_data_path / "grades_3.json", 'r') as f:
+        moodle_grades_3 = json.load(f)
     with open(test_data_path / "quiz_questions.csv", 'r') as f:
         quiz_questions = f.read()
     with open(test_data_path / "quiz_question_contents.csv", 'r') as f:
@@ -36,8 +40,10 @@ def local_file_collections(test_data_path):
         ib_input_submissions = f.read()
 
     return (
-        moodle_grades,
-        moodle_users,
+        moodle_grades_2,
+        moodle_users_2,
+        moodle_grades_3,
+        moodle_users_3,
         quiz_questions,
         quiz_question_contents,
         quiz_multichoice_answers,
