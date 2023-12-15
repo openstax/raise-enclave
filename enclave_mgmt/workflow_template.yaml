@@ -23,7 +23,6 @@ spec:
           - "-cxe"
           - |
             mkdir -p /data/enclave-input/ay2022
-            mkdir -p /data/enclave-input/su2023
             mkdir -p /data/enclave-input/ay2023
             mkdir /data/enclave-output
             aws s3 cp --recursive s3://raise-data/algebra1/ay2022/enclave/ /data/enclave-input/ay2022/

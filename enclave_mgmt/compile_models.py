@@ -19,9 +19,9 @@ def main():
     parser.add_argument('events_prefix', type=str,
                         help='prefix for the event data dirs')
     parser.add_argument('--research_filter_bucket', type=str,
-                        help='bucket containing courses,csv')
+                        help='bucket containing research filter data')
     parser.add_argument('--research_filter_prefix', type=str,
-                        help='prefix for the courses.csv')
+                        help='prefix for research filter CSV')
 
     args = parser.parse_args()
 
@@ -45,13 +45,12 @@ def main():
             BytesIO(courses_stream["Body"].read()),
             keep_default_na=False
         )
-        research_course_df = courses_data_df.loc[courses_data_df[
+        research_filter_df = courses_data_df[courses_data_df[
             'research_participation'] == 1]
-        research_course_df = research_course_df[[
-            'id'
+        research_filter_df = research_filter_df[[
+            'course_id'
         ]]
-        research_course_df.rename(columns={'id': 'course_id'}, inplace=True)
-        create_models(output_path, all_raw_dfs, research_course_df)
+        create_models(output_path, all_raw_dfs, research_filter_df)
     else:
         create_models(output_path, all_raw_dfs)
 

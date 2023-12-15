@@ -27,7 +27,7 @@ MODEL_IB_PSET_PROBLEM_ATTEMPTS = "ib_pset_problem_attempts.csv"
 MODEL_IB_INPUT_SUBMISSIONS = "ib_input_submissions.csv"
 
 
-def create_models(output_path, all_raw_dfs, research_courses_df=None):
+def create_models(output_path, all_raw_dfs, research_filter_df=None):
 
     clean_raw_df = scrub_raw_dfs(all_raw_dfs)
 
@@ -52,27 +52,28 @@ def create_models(output_path, all_raw_dfs, research_courses_df=None):
         clean_raw_df, assessments_df, quiz_multichoice_answers_df
     )
 
-    if research_courses_df is not None:
-        enrollments_df = filter_dataframes_by_course_id(
-            research_courses_df, enrollments_df
+    if research_filter_df is not None:
+        enrollments_df = _filter_dataframes_by_course_id(
+            research_filter_df, enrollments_df
         )
-        grades_df = filter_dataframes_by_course_id(
-            research_courses_df, grades_df
+        grades_df = _filter_dataframes_by_course_id(
+            research_filter_df, grades_df
         )
-        content_loads_df = filter_dataframes_by_course_id(
-            research_courses_df, content_loads_df
+        content_loads_df = _filter_dataframes_by_course_id(
+            research_filter_df, content_loads_df
         )
-        ib_input_submissions_df = filter_dataframes_by_course_id(
-            research_courses_df, ib_input_submissions_df
+        ib_input_submissions_df = _filter_dataframes_by_course_id(
+            research_filter_df, ib_input_submissions_df
         )
-        ib_pset_problem_attempts_df = filter_dataframes_by_course_id(
-            research_courses_df, ib_pset_problem_attempts_df
+        ib_pset_problem_attempts_df = _filter_dataframes_by_course_id(
+            research_filter_df, ib_pset_problem_attempts_df
         )
-        quiz_attempts_df = filter_dataframes_by_course_id(
-            research_courses_df, quiz_attempts_df
+        quiz_attempts_df = _filter_dataframes_by_course_id(
+            research_filter_df, quiz_attempts_df
         )
         users_df = pd.merge(
-            enrollments_df, users_df,
+            enrollments_df['user_uuid'].drop_duplicates(),
+            users_df,
             left_on='user_uuid', right_on='uuid'
         )
         users_df = users_df[
@@ -82,7 +83,7 @@ def create_models(output_path, all_raw_dfs, research_courses_df=None):
              'email']
         ]
         courses_df = pd.merge(
-            research_courses_df, courses_df,
+            research_filter_df, courses_df,
             left_on='course_id', right_on='id'
         )
         courses_df = courses_df[
@@ -461,8 +462,8 @@ def quiz_attempts_and_multichoice_responses_model(
     return quiz_attempts_df, quiz_attempt_multichoice_responses_df
 
 
-def filter_dataframes_by_course_id(research_courses_df, unfiltered_df):
+def _filter_dataframes_by_course_id(research_filter_df, unfiltered_df):
     filtered_df = pd.merge(
-        research_courses_df, unfiltered_df, on='course_id'
+        research_filter_df, unfiltered_df, on='course_id'
     )
     return filtered_df
