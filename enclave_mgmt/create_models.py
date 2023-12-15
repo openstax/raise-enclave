@@ -53,8 +53,23 @@ def create_models(output_path, all_raw_dfs, research_courses_df=None):
     )
 
     if research_courses_df is not None:
-        enrollments_df = pd.merge(
-            research_courses_df, enrollments_df, on='course_id'
+        enrollments_df = filter_dataframes_by_course_id(
+            research_courses_df, enrollments_df
+        )
+        grades_df = filter_dataframes_by_course_id(
+            research_courses_df, grades_df
+        )
+        content_loads_df = filter_dataframes_by_course_id(
+            research_courses_df, content_loads_df
+        )
+        ib_input_submissions_df = filter_dataframes_by_course_id(
+            research_courses_df, ib_input_submissions_df
+        )
+        ib_pset_problem_attempts_df = filter_dataframes_by_course_id(
+            research_courses_df, ib_pset_problem_attempts_df
+        )
+        quiz_attempts_df = filter_dataframes_by_course_id(
+            research_courses_df, quiz_attempts_df
         )
         users_df = pd.merge(
             enrollments_df, users_df,
@@ -66,9 +81,6 @@ def create_models(output_path, all_raw_dfs, research_courses_df=None):
              'last_name',
              'email']
         ]
-        grades_df = pd.merge(
-            research_courses_df, grades_df, on='course_id'
-        )
         courses_df = pd.merge(
             research_courses_df, courses_df,
             left_on='course_id', right_on='id'
@@ -77,18 +89,6 @@ def create_models(output_path, all_raw_dfs, research_courses_df=None):
             ['id',
              'name']
         ]
-        content_loads_df = pd.merge(
-            research_courses_df, content_loads_df, on='course_id'
-        )
-        ib_input_submissions_df = pd.merge(
-            research_courses_df, ib_input_submissions_df, on='course_id'
-        )
-        ib_pset_problem_attempts_df = pd.merge(
-            research_courses_df, ib_pset_problem_attempts_df, on='course_id'
-        )
-        quiz_attempts_df = pd.merge(
-            research_courses_df, quiz_attempts_df, on='course_id'
-        )
         quiz_attempt_multichoice_responses_df = pd.merge(
             quiz_attempts_df, quiz_attempt_multichoice_responses_df,
             left_on='id', right_on='attempt_id'
@@ -459,3 +459,10 @@ def quiz_attempts_and_multichoice_responses_model(
             .to_dict(orient='records'):
         QuizAttemptMultichoiceResponses.model_validate(item)
     return quiz_attempts_df, quiz_attempt_multichoice_responses_df
+
+
+def filter_dataframes_by_course_id(research_courses_df, unfiltered_df):
+    filtered_df = pd.merge(
+        research_courses_df, unfiltered_df, on='course_id'
+    )
+    return filtered_df
