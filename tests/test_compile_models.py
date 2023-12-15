@@ -278,7 +278,9 @@ def test_compile_models(
 
     with open(tmp_path / "quiz_attempt_multichoice_responses.csv", 'r') as f:
         results = list(csv.DictReader(f))
-        assert len(results) == len(expected_quiz_attempt_multichoice_responses)
+        assert len(results) == len(
+          expected_quiz_attempt_multichoice_responses
+          )
         for i in expected_quiz_attempt_multichoice_responses:
             assert i in results
 
@@ -520,7 +522,6 @@ def test_compile_models_filtered(
 
     with open(tmp_path / "users.csv", 'r') as f:
         results = list(csv.DictReader(f))
-        print(tmp_path / "users.csv")
         assert len(results) == len(expected_users)
         for i in expected_users:
             assert i in results

@@ -19,9 +19,9 @@ def main():
     parser.add_argument('events_prefix', type=str,
                         help='prefix for the event data dirs')
     parser.add_argument('--research_filter_bucket', type=str,
-                        help='CHANGE ME')
+                        help='bucket containing courses,csv')
     parser.add_argument('--research_filter_prefix', type=str,
-                        help='CHANGE ME')
+                        help='prefix for the courses.csv')
 
     args = parser.parse_args()
 

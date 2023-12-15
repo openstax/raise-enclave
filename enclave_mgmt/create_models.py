@@ -93,12 +93,13 @@ def create_models(output_path, all_raw_dfs, research_courses_df=None):
             quiz_attempts_df, quiz_attempt_multichoice_responses_df,
             left_on='id', right_on='attempt_id'
         )
-        quiz_attempt_multichoice_responses_df = quiz_attempt_multichoice_responses_df[
-            ['attempt_id',
-             'question_number',
-             'question_id',
-             'answer_id']
-        ]
+        quiz_attempt_multichoice_responses_df = (
+            quiz_attempt_multichoice_responses_df[
+                ['attempt_id',
+                 'question_number',
+                 'question_id',
+                 'answer_id']
+            ])
 
     with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
         users_df.to_csv(f, index=False)

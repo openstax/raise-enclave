@@ -128,7 +128,9 @@ def local_expected_filtered_csvs(test_data_path):
         enrolments = list(csv.DictReader(f))
     with open(test_data_path / "expected_filtered/courses.csv", 'r') as f:
         courses = list(csv.DictReader(f))
-    with open(test_data_path / "expected_filtered/quiz_questions.csv", 'r') as f:
+    with open(
+        test_data_path / "expected_filtered/quiz_questions.csv", 'r'
+    ) as f:
         quiz_questions = list(csv.DictReader(f))
     with open(
         test_data_path / "expected_filtered/quiz_question_contents.csv", 'r'
@@ -138,23 +140,38 @@ def local_expected_filtered_csvs(test_data_path):
         test_data_path / "expected_filtered/quiz_multichoice_answers.csv", 'r'
     ) as f:
         quiz_multichoice_answers = list(csv.DictReader(f))
-    with open(test_data_path / "expected_filtered/ib_input_instances.csv", 'r') as f:
+    with open(
+        test_data_path / "expected_filtered/ib_input_instances.csv", 'r'
+    ) as f:
         ib_input_instances = list(csv.DictReader(f))
-    with open(test_data_path / "expected_filtered/ib_pset_problems.csv", 'r') as f:
+    with open(
+        test_data_path / "expected_filtered/ib_pset_problems.csv", 'r'
+    ) as f:
         ib_pset_problems = list(csv.DictReader(f))
-    with open(test_data_path / "expected_filtered/course_contents.csv", 'r') as f:
+    with open(
+        test_data_path / "expected_filtered/course_contents.csv", 'r'
+    ) as f:
         course_contents = list(csv.DictReader(f))
-    with open(test_data_path / "expected_filtered/quiz_attempts.csv", 'r') as f:
+    with open(
+        test_data_path / "expected_filtered/quiz_attempts.csv", 'r'
+    ) as f:
         quiz_attempts = list(csv.DictReader(f))
-    with open(test_data_path /
-              "expected_filtered/quiz_attempt_multichoice_responses.csv", 'r') as f:
+    with open(
+        test_data_path /
+        "expected_filtered/quiz_attempt_multichoice_responses.csv", 'r'
+    ) as f:
         quiz_attempt_multichoice_responses = list(csv.DictReader(f))
-    with open(test_data_path / "expected_filtered/content_loads.csv", 'r') as f:
+    with open(
+        test_data_path / "expected_filtered/content_loads.csv", 'r'
+    ) as f:
         content_loads = list(csv.DictReader(f))
-    with open(test_data_path / "expected_filtered/ib_pset_problem_attempts.csv", 'r')\
-            as f:
+    with open(
+        test_data_path / "expected_filtered/ib_pset_problem_attempts.csv", 'r'
+    ) as f:
         ib_pset_problem_attempts = list(csv.DictReader(f))
-    with open(test_data_path / "expected_filtered/ib_input_submissions.csv", 'r') as f:
+    with open(
+        test_data_path / "expected_filtered/ib_input_submissions.csv", 'r'
+    ) as f:
         ib_input_submissions = list(csv.DictReader(f))
     return (
         assessments,
