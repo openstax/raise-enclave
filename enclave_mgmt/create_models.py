@@ -71,7 +71,7 @@ def create_models(output_path, all_raw_dfs, research_filter_df=None):
         quiz_attempts_df = filter_dataframes_by_course_id(
             research_filter_df, quiz_attempts_df
         )
-        users_df = drop_duplicate_users(enrollments_df, users_df)
+        users_df = filter_users_by_enrollments(enrollments_df, users_df)
         courses_df = pd.merge(
             research_filter_df, courses_df,
             left_on='course_id', right_on='id'
@@ -459,7 +459,7 @@ def filter_dataframes_by_course_id(research_filter_df, unfiltered_df):
     return filtered_df
 
 
-def drop_duplicate_users(enrollments_df, users_df):
+def filter_users_by_enrollments(enrollments_df, users_df):
     filtered_users_df = pd.merge(
             enrollments_df['user_uuid'].drop_duplicates(),
             users_df,
