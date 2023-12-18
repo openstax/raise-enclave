@@ -27,7 +27,7 @@ MODEL_IB_PSET_PROBLEM_ATTEMPTS = "ib_pset_problem_attempts.csv"
 MODEL_IB_INPUT_SUBMISSIONS = "ib_input_submissions.csv"
 
 
-def create_models(output_path, all_raw_dfs):
+def create_models(output_path, all_raw_dfs, research_filter_df=None):
 
     clean_raw_df = scrub_raw_dfs(all_raw_dfs)
 
@@ -51,6 +51,46 @@ def create_models(output_path, all_raw_dfs):
     ) = quiz_attempts_and_multichoice_responses_model(
         clean_raw_df, assessments_df, quiz_multichoice_answers_df
     )
+
+    if research_filter_df is not None:
+        enrollments_df = filter_dataframes_by_course_id(
+            research_filter_df, enrollments_df
+        )
+        grades_df = filter_dataframes_by_course_id(
+            research_filter_df, grades_df
+        )
+        content_loads_df = filter_dataframes_by_course_id(
+            research_filter_df, content_loads_df
+        )
+        ib_input_submissions_df = filter_dataframes_by_course_id(
+            research_filter_df, ib_input_submissions_df
+        )
+        ib_pset_problem_attempts_df = filter_dataframes_by_course_id(
+            research_filter_df, ib_pset_problem_attempts_df
+        )
+        quiz_attempts_df = filter_dataframes_by_course_id(
+            research_filter_df, quiz_attempts_df
+        )
+        users_df = filter_users_by_enrollments(enrollments_df, users_df)
+        courses_df = pd.merge(
+            research_filter_df, courses_df,
+            left_on='course_id', right_on='id'
+        )
+        courses_df = courses_df[
+            ['id',
+             'name']
+        ]
+        quiz_attempt_multichoice_responses_df = pd.merge(
+            quiz_attempts_df, quiz_attempt_multichoice_responses_df,
+            left_on='id', right_on='attempt_id'
+        )
+        quiz_attempt_multichoice_responses_df = (
+            quiz_attempt_multichoice_responses_df[
+                ['attempt_id',
+                 'question_number',
+                 'question_id',
+                 'answer_id']
+            ])
 
     with open(f"{output_path}/{MODEL_FILE_USERS}", "w") as f:
         users_df.to_csv(f, index=False)
@@ -204,7 +244,6 @@ def assessments_and_grades_model(clean_raw_df):
         Assessment.model_validate(item)
     for item in grades_df.to_dict(orient='records'):
         Grade.model_validate(item)
-
     return assessments_df, grades_df
 
 
@@ -411,3 +450,27 @@ def quiz_attempts_and_multichoice_responses_model(
             .to_dict(orient='records'):
         QuizAttemptMultichoiceResponses.model_validate(item)
     return quiz_attempts_df, quiz_attempt_multichoice_responses_df
+
+
+def filter_dataframes_by_course_id(research_filter_df, unfiltered_df):
+    filtered_df = pd.merge(
+        research_filter_df, unfiltered_df, on='course_id'
+    )
+    return filtered_df
+
+
+def filter_users_by_enrollments(enrollments_df, users_df):
+    filtered_users_df = pd.merge(
+            enrollments_df['user_uuid'].drop_duplicates(),
+            users_df,
+            left_on='user_uuid',
+            right_on='uuid'
+        )
+
+    filtered_users_df = filtered_users_df[
+            ['uuid',
+             'first_name',
+             'last_name',
+             'email']
+        ]
+    return filtered_users_df

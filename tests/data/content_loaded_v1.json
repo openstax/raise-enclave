@@ -29,6 +29,16 @@
             "eventname": "content_loaded_v1",
             "content_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7",
             "variant": "string"
+        },
+        {
+            "user_uuid": "d35a986b-a7ad-4c61-8e76-205eccaf9a06",
+            "course_id": 3,
+            "impression_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "source_uri": "https://localhost:8000",
+            "timestamp": 0,
+            "eventname": "content_loaded_v1",
+            "content_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7",
+            "variant": "string"
         }
     ]
 }

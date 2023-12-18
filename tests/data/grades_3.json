@@ -1,0 +1,147 @@
+{
+  "usergrades": [
+    {
+      "courseid": 3,
+      "courseidnumber": "",
+      "gradeitems": [
+        {
+          "categoryid": 2,
+          "cmid": 17,
+          "feedback": "",
+          "feedbackformat": 0,
+          "gradedategraded": null,
+          "gradedatesubmitted": null,
+          "gradeformatted": "-",
+          "gradehiddenbydate": false,
+          "gradeishidden": false,
+          "gradeislocked": false,
+          "gradeisoverridden": false,
+          "grademax": 10,
+          "grademin": 0,
+          "gradeneedsupdate": false,
+          "graderaw": null,
+          "id": 16,
+          "idnumber": null,
+          "iteminstance": 1,
+          "itemmodule": "quiz",
+          "itemname": "Unit 1, Section A Quiz",
+          "itemnumber": 0,
+          "itemtype": "mod",
+          "locked": false,
+          "outcomeid": null,
+          "percentageformatted": "-",
+          "rangeformatted": "0&ndash;10",
+          "scaleid": null,
+          "status": "novalue",
+          "weightformatted": "0.00 %",
+          "weightraw": 0
+        },
+        {
+          "categoryid": 2,
+          "cmid": 31,
+          "feedback": "",
+          "feedbackformat": 0,
+          "gradedategraded": 1661272186,
+          "gradedatesubmitted": 1661272186,
+          "gradeformatted": "8.00",
+          "gradehiddenbydate": false,
+          "gradeishidden": false,
+          "gradeislocked": false,
+          "gradeisoverridden": false,
+          "grademax": 10,
+          "grademin": 0,
+          "gradeneedsupdate": false,
+          "graderaw": 8,
+          "id": 29,
+          "idnumber": null,
+          "iteminstance": 2,
+          "itemmodule": "quiz",
+          "itemname": "Unit 1, Section B Quiz",
+          "itemnumber": 0,
+          "itemtype": "mod",
+          "locked": false,
+          "outcomeid": null,
+          "percentageformatted": "80.00 %",
+          "rangeformatted": "0&ndash;10",
+          "scaleid": null,
+          "weightformatted": "11.11 %",
+          "weightraw": 0.11111
+        }
+      ],
+      "maxdepth": 2,
+      "userfullname": "Chris Pirelli",
+      "userid": 37,
+      "useridnumber": ""
+    }
+  ],
+  "warnings": [],
+  "quizzes": [
+    {
+      "id": 11,
+      "name": "Unit 1, Section A Quiz",
+      "sumgrades": 5,
+      "course": 3
+    },
+    {
+      "id": 12,
+      "name": "Unit 1, Section B Quiz",
+      "sumgrades": 5,
+      "course": 3
+    }
+  ],
+  "attempts": {
+    "37": {
+      "12": {
+        "summaries": [
+          {
+            "id": 1,
+            "quiz": 12,
+            "userid": 37,
+            "attempt": 1,
+            "timestart": 1650122648,
+            "timefinish": 1661272078,
+            "sumgrades": 0
+          }
+        ],
+        "details": {
+          "1": {
+            "attempt": {
+              "id": 1,
+              "quiz": 12,
+              "userid": 37,
+              "attempt": 1
+            },
+            "questions": [
+              {
+                "slot": 1,
+                "answer": [
+                  "<p>80</p>"
+                ]
+              },
+              {
+                "slot": 2,
+                "answer": [
+                  "<p>30</p>"
+                ]
+              },
+              {
+                "slot": 3,
+                "answer": [
+                  "<p>23</p>"
+                ]
+              },
+              {
+                "slot": 4,
+                "answer": []
+              },
+              {
+                "slot": 5,
+                "answer": []
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

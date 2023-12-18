@@ -1,0 +1,35 @@
+[
+  {
+    "department": "",
+    "description": "",
+    "descriptionformat": 1,
+    "email": "chrispirelli13431@gmail.us",
+    "enrolledcourses": [
+      {
+        "fullname": "Algebra 2 (Research Dev 2)",
+        "id": 3,
+        "shortname": "Alg2"
+      }
+    ],
+    "firstaccess": 1661273594,
+    "firstname": "Chris",
+    "fullname": "Chris Pirelli",
+    "groups": [],
+    "id": 37,
+    "uuid": "d35a986b-a7ad-4c61-8e76-205eccaf9a06",
+    "lastaccess": 1661273865,
+    "lastcourseaccess": 1661273865,
+    "lastname": "Pirelli",
+    "profileimageurl": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f1",
+    "profileimageurlsmall": "https://research-dev.raiselearning.org/theme/image.php/boost/core/1660688913/u/f2",
+    "roles": [
+      {
+        "name": "",
+        "roleid": 5,
+        "shortname": "student",
+        "sortorder": 0
+      }
+    ],
+    "username": "chrispirelli13431@gmail.us"
+  }
+]

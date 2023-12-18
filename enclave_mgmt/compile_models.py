@@ -1,5 +1,8 @@
 import os
 import argparse
+import boto3
+import pandas as pd
+from io import BytesIO
 
 from enclave_mgmt.collect_data import collect_data
 from enclave_mgmt.create_models import create_models
@@ -15,6 +18,10 @@ def main():
                         help='bucket for the event data dirs')
     parser.add_argument('events_prefix', type=str,
                         help='prefix for the event data dirs')
+    parser.add_argument('--research_filter_bucket', type=str,
+                        help='bucket containing research filter data')
+    parser.add_argument('--research_filter_prefix', type=str,
+                        help='prefix for research filter CSV')
 
     args = parser.parse_args()
 
@@ -27,7 +34,25 @@ def main():
         args.events_prefix
         )
 
-    create_models(output_path, all_raw_dfs)
+    research_filter_bucket = args.research_filter_bucket
+    research_filter_key = args.research_filter_prefix
+    if research_filter_bucket and research_filter_key:
+        s3_client = boto3.client("s3")
+        courses_stream = s3_client.get_object(
+            Bucket=research_filter_bucket,
+            Key=research_filter_key)
+        courses_data_df = pd.read_csv(
+            BytesIO(courses_stream["Body"].read()),
+            keep_default_na=False
+        )
+        research_filter_df = courses_data_df[courses_data_df[
+            'research_participation'] == 1]
+        research_filter_df = research_filter_df[[
+            'course_id'
+        ]]
+        create_models(output_path, all_raw_dfs, research_filter_df)
+    else:
+        create_models(output_path, all_raw_dfs)
 
 
 if __name__ == "__main__":  # pragma: no cover
