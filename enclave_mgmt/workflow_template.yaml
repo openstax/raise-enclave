@@ -26,7 +26,7 @@ spec:
             mkdir -p /data/enclave-input/ay2023
             mkdir /data/enclave-output
             aws s3 cp --recursive s3://raise-data/algebra1/ay2022/enclave/ /data/enclave-input/ay2022/
-            CSV_OUTPUT_DIR=/data/enclave-input/ay2023 compile-models raise-data algebra1/ay2023 raise-data events --research-filter-bucket raise-data --research-filter-prefix algebra1/ay2023/automation/courses.csv
+            CSV_OUTPUT_DIR=/data/enclave-input/ay2023 compile-models raise-data algebra1/ay2023 raise-data events --research_filter_bucket raise-data --research_filter_prefix algebra1/ay2023/automation/courses.csv
       volumeMounts:
       - name: workdir
         mountPath: /data
