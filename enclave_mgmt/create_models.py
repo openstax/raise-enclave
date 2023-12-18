@@ -53,35 +53,25 @@ def create_models(output_path, all_raw_dfs, research_filter_df=None):
     )
 
     if research_filter_df is not None:
-        enrollments_df = _filter_dataframes_by_course_id(
+        enrollments_df = filter_dataframes_by_course_id(
             research_filter_df, enrollments_df
         )
-        grades_df = _filter_dataframes_by_course_id(
+        grades_df = filter_dataframes_by_course_id(
             research_filter_df, grades_df
         )
-        content_loads_df = _filter_dataframes_by_course_id(
+        content_loads_df = filter_dataframes_by_course_id(
             research_filter_df, content_loads_df
         )
-        ib_input_submissions_df = _filter_dataframes_by_course_id(
+        ib_input_submissions_df = filter_dataframes_by_course_id(
             research_filter_df, ib_input_submissions_df
         )
-        ib_pset_problem_attempts_df = _filter_dataframes_by_course_id(
+        ib_pset_problem_attempts_df = filter_dataframes_by_course_id(
             research_filter_df, ib_pset_problem_attempts_df
         )
-        quiz_attempts_df = _filter_dataframes_by_course_id(
+        quiz_attempts_df = filter_dataframes_by_course_id(
             research_filter_df, quiz_attempts_df
         )
-        users_df = pd.merge(
-            enrollments_df['user_uuid'].drop_duplicates(),
-            users_df,
-            left_on='user_uuid', right_on='uuid'
-        )
-        users_df = users_df[
-            ['uuid',
-             'first_name',
-             'last_name',
-             'email']
-        ]
+        users_df = drop_duplicate_users(enrollments_df, users_df)
         courses_df = pd.merge(
             research_filter_df, courses_df,
             left_on='course_id', right_on='id'
@@ -462,8 +452,25 @@ def quiz_attempts_and_multichoice_responses_model(
     return quiz_attempts_df, quiz_attempt_multichoice_responses_df
 
 
-def _filter_dataframes_by_course_id(research_filter_df, unfiltered_df):
+def filter_dataframes_by_course_id(research_filter_df, unfiltered_df):
     filtered_df = pd.merge(
         research_filter_df, unfiltered_df, on='course_id'
     )
     return filtered_df
+
+
+def drop_duplicate_users(enrollments_df, users_df):
+    filtered_users_df = pd.merge(
+            enrollments_df['user_uuid'].drop_duplicates(),
+            users_df,
+            left_on='user_uuid',
+            right_on='uuid'
+        )
+
+    filtered_users_df = filtered_users_df[
+            ['uuid',
+             'first_name',
+             'last_name',
+             'email']
+        ]
+    return filtered_users_df
