@@ -128,7 +128,7 @@ Sample files that can be used as illustrative references can be found in this re
 
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | A unique UUID value that is assigned to an input interactive attempt |
+| id | int | A unique id that is assigned to an input interactive attempt |
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
@@ -142,7 +142,7 @@ Sample files that can be used as illustrative references can be found in this re
 
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | A unique UUID value that is assigned to a pset problem interactive attempt |
+| id | int | A unique id that is assigned to a pset problem interactive attempt |
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
@@ -187,7 +187,7 @@ Sample files that can be used as illustrative references can be found in this re
 
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | A unique UUID value that is assigned to an attempt at a quiz question |
+| id | int | A unique id that is assigned to an attempt at a quiz question |
 | quiz_attempt_id | int | Quiz attempt ID that can be joined against quiz_attempts.csv |
 | question_number | int |  The relative order number of the question in the quiz |
 | question_id | UUID | Question ID that can be joined against quiz_question_contents.csv |
@@ -245,7 +245,7 @@ Key notes:
 ## `view_ib_input.csv`
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | A unique UUID value that is assigned to an input interactive attempt |
+| id | int | A unique id that is assigned to an input interactive attempt |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression, same as `impression_id` in `content_loads.csv` and `ib_input_submissions.csv` |
 | user_uuid | UUID | User UUID |
 | course_id | int | Course ID |
@@ -264,7 +264,7 @@ Key notes:
 
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | A unique UUID value that is assigned to an attempt at a question in a pset interactive, same as `id` in `ib_pset_problem_attempts.csv` |
+| id | int | A unique id that is assigned to an attempt at a question in a pset interactive, same as `id` in `ib_pset_problem_attempts.csv` |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression, same as `impression_id` in `content_loads.csv` and `ib_pset_problem_attempts.csv` |
 | user_uuid | UUID | User UUID |
 | course_id | int | Course ID |
@@ -289,7 +289,7 @@ Key notes:
 
 | Column | Type | Notes |
 | - | - | - |
-| id | UUID | A unique UUID value that is assigned to an attempt at a question in a quiz, same as `id` in `quiz_attempt_multichoice_responses.csv` |
+| id | int | A unique id that is assigned to an attempt at a question in a quiz, same as `id` in `quiz_attempt_multichoice_responses.csv` |
 | attempt_id | int | Attempt ID of a quiz, same as `id` in `quiz_attempts.csv` and `attempt_id` in `quiz_attempt_multichoice_responses.csv` |
 | quiz_id | int | Quiz ID, same as `assessment_id` in `quiz_attempts.csv` and `id` in `assessments.csv` |
 | quiz_name | str | The user friendly name associated with this quiz, same as `assessment_name` in `assessments.csv`|
