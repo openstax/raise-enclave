@@ -52,6 +52,13 @@ Each path above includes the following data files:
 | [quiz_multichoice_answers.csv](#quiz_multichoice_answerscsv) | Details on option choices for `multichoice` quiz questions |
 | [users.csv](#userscsv) | User information |
 
+In addition, prejoined view tables are available for easy data query:
+| CSV | Description | Source data
+| - | - | - |
+| [view_enrollment.csv](#view_enrollmentcsv) | Enhanced enrollment information with course ID, course name, user ID and user role | `enrollments.csv`, `courses.csv`
+| [view_ib_input.csv](#view_ib_inputcsv) | Event data for open input interactive, with additional information of the question and relevant content | `ib_input_submissions.csv`, `ib_input_instances.csv`, `course_contents.csv`
+| [view_ib_pset.csv](#view_ib_psetcsv) | Event data for pset problem interactive, with additional information of the question and relevant content | `ib_pset_problem_attempts.csv`, `ib_pset_problems.csv`, `course_contents.csv`
+| [view_quiz.csv](#view_quizcsv) | User responses to quizzes, with additional information of item, assessment, and quiz attempt | `quiz_attempts.csv`, `assessments.csv`, `quiz_question_contents.csv`, `quiz_attempt_multichoice_responses.csv`, `quiz_multichoice_answers.csv` 
 
 Sample files that can be used as illustrative references can be found in this repo [here](../examples/data). Details on columns and types for each CSV file are documented below.
 
@@ -225,6 +232,80 @@ Key notes:
 | first_name | str | User's first name |
 | last_name | str | User's last name |
 | email | str | User's email |
+
+## `view_enrollment.csv`
+| Column | Type | Notes |
+| - | - | - |
+| user_uuid | UUID | User UUID |
+| course_id | int | Course ID, same as `id` in `courses.csv` and `course_id` in `enrollments.csv` |
+| course_name | str | User friendly course name |
+| role | str | Value of either `student` or `teacher` to indicate a user's role in a course |
+
+## `view_ib_input.csv`
+| Column | Type | Notes |
+| - | - | - |
+| id | UUID | A unique UUID value that is assigned to an input interactive attempt |
+| impression_id | UUID | A unique identifier that can be used to associate events in a single user impression, same as `impression_id` in `content_loads.csv` and `ib_input_submissions.csv` |
+| user_uuid | UUID | User UUID |
+| course_id | int | Course ID |
+| content_page_id | UUID | Content page UUID, same as `content_id` in `course_contents.csv` and `ib_input_submissions.csv` |
+| section | str | Section name of the associated content page |
+| activity | str | Activity name of the associated content page |
+| lesson_page | str | Lesson page name of the associated content page |
+| timestamp | int | A Unix timestamp value that reflects when the grade was created for this input (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| input_question_id | UUID | A unique identifier of an input question, same as `input_content_id` in `ib_input_submissions.csv` and `id` in `ib_input_instances.csv` |
+| input_question_content | str | Content of the input question, same as `content` in `ib_input_instances.csv` |
+| input_question_prompt | str | Prompt of the input question, same as `prompt` in `ib_input_instances.csv` |
+| variant | str | Variant name |
+| response | str | User input to the interactive |
+
+## `view_ib_pset.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | UUID | A unique UUID value that is assigned to an attempt at a question in a pset interactive, same as `id` in `ib_pset_problem_attempts.csv` |
+| impression_id | UUID | A unique identifier that can be used to associate events in a single user impression, same as `impression_id` in `content_loads.csv` and `ib_pset_problem_attempts.csv` |
+| user_uuid | UUID | User UUID |
+| course_id | int | Course ID |
+| content_page_id | UUID | Content page UUID, same as `content_id` in `course_contents.csv` and `ib_pset_problem_attempts.csv` |
+| section | str | Section name of the associated content page |
+| activity | str | Activity name of the associated content page |
+| lesson_page | str | Lesson page name of the associated content page |
+| pset_id | UUID | Problem set ID, same as `pset_content_id` in `ib_pset_problem_attempts.csv` and `pset_id` in `ib_pset_problems.csv` |
+| pset_problem_id | UUID | Problem ID, same as `pset_problem_content_id` in `ib_pset_problem_attempts.csv` and `id` in `ib_pset_problems.csv` |
+| timestamp | int | A Unix timestamp value that reflects when the grade was created for this problem attempt (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| variant | str | Variant name |
+| problem_type | str | The type of problem (one of 'input', 'dropdown', 'multiselect', or 'multiplechoice') |
+| problem_content | str | Problem content, same as `content` in `ib_pset_problems.csv` |
+| problem_solution | str | Correct solution for problem, same as `solution` in `ib_pset_problems.csv`|
+| solution_options | str | Solution options for problem, same as `solution_options` in `ib_pset_problems.csv` |
+| problem_response | str or str[] when `problem_type` is `multiselect` | User response to the problem, same as `response` in `ib_pset_problem_attempts.csv` |
+| is_correct | bool | Whether the response was correct, same as `correct` in `ib_pset_problem_attempts.csv` |
+| attempt_number | int | Attempt count for the problem, same as `attempt` in `ib_pset_problem_attempts.csv` |
+| is_final_attempt | bool | Whether the attempt was the final allowed attempt for the problem, same as `final_attempt` in `ib_pset_problem_attempts.csv` |
+
+## `view_quiz.csv`
+
+| Column | Type | Notes |
+| - | - | - |
+| id | UUID | A unique UUID value that is assigned to an attempt at a question in a quiz, same as `id` in `quiz_attempt_multichoice_responses.csv` |
+| attempt_id | int | Attempt ID of a quiz, same as `id` in `quiz_attempts.csv` and `attempt_id` in `quiz_attempt_multichoice_responses.csv` |
+| quiz_id | int | Quiz ID, same as `assessment_id` in `quiz_attempts.csv` and `id` in `assessments.csv` |
+| quiz_name | str | The user friendly name associated with this quiz, same as `assessment_name` in `assessments.csv`|
+| user_uuid | UUID | User UUID |
+| course_id | int | Course ID |
+| quiz_attempt_number | int | The attempt number for the user in this quiz, same as `attempt_number` in `quiz_attempts.csv` |
+| quiz_grade_percentage | float | A value between 0 and 100 that reflects the attempt grade, same as `grade_percentage` in `quiz_attempts.csv`|
+| quiz_start_time | int | A Unix timestamp value that reflects when the quiz attempt was started (seconds that have elapsed since 00:00:00 UTC on January 1, 1970), same as `time_started` in `quiz_attempts.csv` |
+| quiz_end_time | int | A Unix timestamp value that reflects when the quiz attempt was finished (seconds that have elapsed since 00:00:00 UTC on January 1, 1970), same as `time_finished` in `quiz_attempts.csv` |
+| question_id | UUID | Unique identifier of a quiz question, same as `id` in `quiz_question_contents.csv`, and `question_id` in `quiz_attempt_multichoice_responses.csv` and `quiz_multichoice_answers.csv`|
+| question_number | int |  The relative order number of the question in the quiz |
+| question_text | str | The question text, same as `text` in `quiz_question_contents.csv` |
+| question_type | str | The type of question (can be ['multichoice', 'multianswer', 'numerical', 'essay']), same as `type` in `quiz_question_contents.csv` |
+| answer_id | int | Question choice ID, same as `id` in `quiz_multichoice_answers.csv` and `answer_id` in `quiz_attempt_multichoice_responses.csv` |
+| answer_text | str | The answer text, same as `text` in `quiz_multichoice_answers.csv`|
+| answer_grade | float | The percentage of the question's total points received for this answer, same as `grade` in `quiz_multichoice_answers.csv` |
+| answer_feedback | str | The feedback that gets delivered when this answer is chosen, same as `feedback` in `quiz_multichoice_answers.csv`|
 
 
 ## Development and testing
