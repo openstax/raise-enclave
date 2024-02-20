@@ -121,6 +121,7 @@ Sample files that can be used as illustrative references can be found in this re
 
 | Column | Type | Notes |
 | - | - | - |
+| id | UUID | A unique UUID value that is assigned to an input interactive attempt |
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
@@ -134,6 +135,7 @@ Sample files that can be used as illustrative references can be found in this re
 
 | Column | Type | Notes |
 | - | - | - |
+| id | UUID | A unique UUID value that is assigned to a pset problem interactive attempt |
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
