@@ -187,7 +187,8 @@ Sample files that can be used as illustrative references can be found in this re
 
 | Column | Type | Notes |
 | - | - | - |
-| attempt_id | int | Attempt ID that can be joined against quiz_attempts.csv |
+| id | UUID | A unique UUID value that is assigned to an attempt at a quiz question |
+| quiz_attempt_id | int | Quiz attempt ID that can be joined against quiz_attempts.csv |
 | question_number | int |  The relative order number of the question in the quiz |
 | question_id | UUID | Question ID that can be joined against quiz_question_contents.csv |
 | answer_id | int | Question choice ID that can be joined against quiz_multichoice_answers.csv |
