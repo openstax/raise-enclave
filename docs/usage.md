@@ -69,7 +69,7 @@ Sample files that can be used as illustrative references can be found in this re
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
-| timestamp | int | A Unix timestamp value that reflects when the grade was created (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| timestamp | int | A Unix timestamp value that reflects when the content was loaded (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
 | content_id | UUID | Content ID that can be joined against `course_contents.csv` |
 | variant | str | Variant name |
 
@@ -124,7 +124,7 @@ Sample files that can be used as illustrative references can be found in this re
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
-| timestamp | int | A Unix timestamp value that reflects when the grade was created (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| timestamp | int | A Unix timestamp value that reflects when the submission was made (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
 | content_id | UUID | Content ID that can be joined against `course_contents.csv` |
 | input_content_id | UUID | Input content ID that can be joined against `ib_input_instances.csv` via its `id` column |
 | variant | str | Variant name |
@@ -137,7 +137,7 @@ Sample files that can be used as illustrative references can be found in this re
 | user_uuid | UUID | User UUID that can be joined against `users.csv` |
 | course_id | int | Course ID that can be joined against `courses.csv` |
 | impression_id | UUID | A unique identifier that can be used to associate events in a single user impression |
-| timestamp | int | A Unix timestamp value that reflects when the grade was created (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
+| timestamp | int | A Unix timestamp value that reflects when the attempt was made (milliseconds that have elapsed since 00:00:00 UTC on January 1, 1970) |
 | content_id | UUID | Content ID that can be joined against `course_contents.csv` |
 | pset_content_id | UUID | Problem set ID that can be joined against `ib_pset_problems.csv` via its `pset_id` column |
 | pset_problem_content_id | UUID | Problem ID that can be joined against `ib_pset_problems.csv` via its `id` column|
