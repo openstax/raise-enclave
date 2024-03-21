@@ -10,3 +10,10 @@ spec:
   policyTypes:
     - Ingress
     - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/16
+    ports:
+      - protocol: TCP
+        port: 443
