@@ -30,6 +30,7 @@ Enclave containers can access data serialized in CSV format. Data files are popu
 | - | - |
 | `{DATA_INPUT_DIR}/ay2022` | Academic year spanning Fall 2022 through Spring 2023 |
 | `{DATA_INPUT_DIR}/ay2023` | Academic year spanning Fall 2023 through Spring 2024 |
+| `{DATA_INPUT_DIR}/ay2024` | Academic year spanning Fall 2024 through Spring 2025 |
 
 Each path above includes the following data files:
 
